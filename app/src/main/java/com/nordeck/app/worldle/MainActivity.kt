@@ -3,25 +3,23 @@ package com.nordeck.app.worldle
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +45,8 @@ class MainActivity : ComponentActivity() {
 
                     when (val state = viewModel.state.observeAsState().value) {
                         null -> GameLoadingView()
-                        else -> GameInProgressView(state, viewModel)
+                        // TODO game over view
+                        else -> GameView(state, viewModel)
                     }
 
                 }
@@ -62,7 +61,7 @@ fun GameLoadingView() {
 }
 
 @Composable
-fun GameInProgressView(state: GameViewModel.State, viewModel: GameViewModel) {
+fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
     Column {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -77,6 +76,13 @@ fun GameInProgressView(state: GameViewModel.State, viewModel: GameViewModel) {
                 .fillMaxWidth()
                 .background(Color.Red)
         )
+
+        if (state.guesses.isNotEmpty()) {
+            PreviousGuesses(
+                modifier = Modifier.fillMaxWidth(),
+                state = state
+            )
+        }
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
@@ -94,38 +100,84 @@ fun GameInProgressView(state: GameViewModel.State, viewModel: GameViewModel) {
         )
 
         if (state.suggestions.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
+            SearchSuggestions(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+                viewModel = viewModel
+            )
+        }
+    }
+}
+
+@Composable
+private fun PreviousGuesses(
+    modifier: Modifier,
+    state: GameViewModel.State
+) {
+    Column(modifier = modifier) {
+        state.guesses.forEach { guess ->
+            // TODO make pretty
+            Row(
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                state.suggestions.forEach { suggestion ->
-                    item {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.onSuggestionSelected(suggestion)
-                                },
-                            text = buildAnnotatedString {
-                                // TODO figure out how to split and keep the delimiter
-                                val parts = suggestion.name.split(Regex("((?=${suggestion.name})|(?<=${suggestion.name}))"))
-                                parts.forEach {
-                                    if (it.equals(state.guessInput, true)) {
-                                        withStyle(
-                                            style = SpanStyle(
-                                                color = MaterialTheme.colors.primary,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        ) {
-                                            append(it)
-                                        }
-                                    } else {
-                                        append(it)
-                                    }
+
+                Text(text = guess.country.name)
+
+                Text(text = guess.getDistanceFrom())
+
+                Text(text = "${guess.proximityPercent}%")
+
+                Image(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .rotate(guess.direction.rotation),
+                    painter = painterResource(id = guess.direction.drawableResId),
+                    contentDescription = guess.direction.name,
+                    colorFilter = ColorFilter.tint(Color.Blue)
+                )
+            }
+        }
+    }
+
+}
+
+@Composable
+private fun SearchSuggestions(
+    modifier: Modifier,
+    state: GameViewModel.State,
+    viewModel: GameViewModel
+) {
+    LazyColumn(
+        modifier = modifier
+    ) {
+        state.suggestions.forEach { suggestion ->
+            item {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            viewModel.onSuggestionSelected(suggestion)
+                        },
+                    text = buildAnnotatedString {
+                        // TODO figure out how to split and keep the delimiter
+                        val parts =
+                            suggestion.name.split(Regex("((?=${suggestion.name})|(?<=${suggestion.name}))"))
+                        parts.forEach {
+                            if (it.equals(state.guessInput, true)) {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = MaterialTheme.colors.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(it)
                                 }
+                            } else {
+                                append(it)
                             }
-                        )
+                        }
                     }
-                }
+                )
             }
         }
     }

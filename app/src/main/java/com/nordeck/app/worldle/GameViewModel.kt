@@ -1,6 +1,7 @@
 package com.nordeck.app.worldle
 
 import android.content.Context
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import java.util.*
 import kotlin.math.floor
 
 
@@ -102,13 +104,32 @@ data class Country(
     val vectorAsset = "file:///android_asset/${code.lowercase()}/vector.svg"
 }
 
+private fun Locale.isMetric(): Boolean {
+    return when (country.uppercase(this)) {
+        "US", "LR", "MM" -> false
+        else -> true
+    }
+}
+
 data class Guess(
     val country: Country,
-    val distanceFrom: Int,
+    /**
+     * Distance in meters
+     */
+    private val distanceFrom: Int,
     val proximityPercent: Int,
     val direction: Direction
 ) {
 
+    fun getDistanceFrom(locale: Locale = Locale.getDefault()): String {
+        return if (locale.isMetric()) {
+            "${(distanceFrom / 1000)} km"
+        } else {
+            "${(distanceFrom * 0.621371).toInt()} mi"
+        }
+    }
+
+    // TODO add name res id for content description
     enum class Direction(
         val start: Double,
         val end: Double
@@ -180,6 +201,15 @@ data class Guess(
         NNW(
             start = 326.25,
             end = 348.75,
-        ),
+        );
+
+        val rotation: Float = ((start - end) / 2).toFloat()
+
+        val drawableResId: Int
+            @DrawableRes get() =
+                when (this) {
+                    CORRECT -> R.drawable.ic_correct
+                    else -> R.drawable.ic_direction
+                }
     }
 }
