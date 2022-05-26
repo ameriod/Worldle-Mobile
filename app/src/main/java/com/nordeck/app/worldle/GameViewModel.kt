@@ -45,8 +45,14 @@ class GameViewModel(context: Context) : ViewModel() {
         stateChannel.value?.let { currentState ->
             stateChannel.value = currentState.copy(
                 guessInput = input,
-                suggestions = if (input.isEmpty()) emptyList() else countries.filter {
-                    it.name.contains(input, true)
+                suggestions = if (input.isEmpty()) {
+                    emptyList()
+                } else {
+                    countries.filter { country ->
+                        country.name.contains(input, true) &&
+                                // Do not show an already selected country.
+                                !currentState.guesses.any { it.country == country }
+                    }
                 }
             )
         }
