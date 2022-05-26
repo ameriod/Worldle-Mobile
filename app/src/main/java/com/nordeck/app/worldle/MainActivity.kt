@@ -82,17 +82,19 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
             )
         }
 
-
-        if (state.guesses.isNotEmpty()) {
+        state.guesses.forEach { guess ->
             item {
-                PreviousGuesses(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = state
+                GuessView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp
+                        ),
+                    guess = guess
                 )
             }
-
         }
-
 
         item {
             TextField(
@@ -119,32 +121,16 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                         .clickable {
                             viewModel.onSuggestionSelected(suggestion)
                         }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp
+                        ),
                     text = suggestion.highlightGuess(
                         input = state.guessInput,
                         highlightColor = MaterialTheme.colors.primary
                     )
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun PreviousGuesses(
-    modifier: Modifier,
-    state: GameViewModel.State
-) {
-    Column(
-        modifier = modifier
-    ) {
-        state.guesses.forEach { guess ->
-            GuessView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                guess = guess
-            )
         }
     }
 }
