@@ -77,7 +77,11 @@ class GameViewModel(context: Context) : ViewModel() {
                         // TODO
                         proximityPercent = 0,
                         // TODO
-                        direction = Guess.Direction.N
+                        direction = if (suggestion == currentState.countryToGuess) {
+                            Guess.Direction.CORRECT
+                        } else {
+                            Guess.Direction.N
+                        }
                     )
                     add(newGuess)
                 }
@@ -92,7 +96,9 @@ class GameViewModel(context: Context) : ViewModel() {
         val guesses: List<Guess>
     ) {
 
-        val isGameOver: Boolean = guesses.size > MAX_GUESSES
+        val hasLostGame: Boolean = guesses.size > MAX_GUESSES
+
+        val hasWonGame: Boolean = guesses.any { it.country == countryToGuess }
     }
 }
 

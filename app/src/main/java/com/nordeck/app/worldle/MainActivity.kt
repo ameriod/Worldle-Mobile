@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -15,9 +16,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -34,6 +37,7 @@ import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.nordeck.app.worldle.ui.theme.WorldleAndoirdTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,9 +68,18 @@ fun GameLoadingView() {
     Text(text = "Loading")
 }
 
+private val COUNTRY_HEIGHT = 200.dp
+
 @Composable
 fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
-    LazyColumn {
+
+    val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        state = listState
+    ) {
         item {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -77,7 +90,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .height(240.dp)
+                    .height(COUNTRY_HEIGHT)
                     .fillMaxWidth()
             )
         }
@@ -98,7 +111,16 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
 
         item {
             TextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusEvent {
+                        if (it.hasFocus && state.guesses.isNotEmpty()) {
+                            coroutineScope.launch {
+                                // Scroll down
+                                listState.animateScrollToItem(0, COUNTRY_HEIGHT.value.toInt())
+                            }
+                        }
+                    },
                 value = state.guessInput,
                 onValueChange = {
                     viewModel.onGuessUpdated(it)
