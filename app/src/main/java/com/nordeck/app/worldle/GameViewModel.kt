@@ -33,13 +33,15 @@ class GameViewModel(context: Context) : ViewModel() {
             stream = context.assets.open("countries.json")
         ).sortedBy { it.name }
 
-        stateChannel.value = createNewGame()
+        stateChannel.value = createNewGame(
+            countryToGuess = countries.random()
+        )
     }
 
-    private fun createNewGame(): State = State(
+    private fun createNewGame(countryToGuess: Country): State = State(
         guessInput = "",
         suggestions = emptyList(),
-        countryToGuess = countries.random(),
+        countryToGuess = countryToGuess,
         guesses = emptyList()
     )
 
@@ -90,11 +92,12 @@ class GameViewModel(context: Context) : ViewModel() {
             Guess.Direction.CORRECT
         } else {
             val bearing = getLineBearing(suggestion, dest)
-            Guess.Direction.values().filter { it != Guess.Direction.CORRECT }
+            // Make sure we only use real "Direction"
+            Guess.Direction.values().filter { it.isDirection }
                 .firstOrNull { it.isInRange(bearing) } ?: run {
-                // TODO this is crashing / not matching one of the directions
-                Timber.e("ERROR direction not found: $bearing")
-                Guess.Direction.CORRECT
+                // This should never happen, but if it does, do not crash.
+                Timber.e("ERROR bearing not in range: $bearing")
+                Guess.Direction.ERROR
             }
         }
     }
@@ -141,9 +144,9 @@ class GameViewModel(context: Context) : ViewModel() {
             )
             stateChannel.value = when {
                 // TODO won state
-                newState.hasWonGame -> createNewGame()
+                newState.hasWonGame -> createNewGame(countries.first())
                 // TODO lost state
-                newState.hasLostGame -> createNewGame()
+                newState.hasLostGame -> createNewGame(countries.last())
                 else -> newState
             }
         }
@@ -205,11 +208,19 @@ data class Guess(
     enum class Direction(
         val start: Double,
         val end: Double,
+        @DrawableRes
+        val drawableResId: Int = R.drawable.ic_direction,
         val rotation: Float = 0.0f
     ) {
         CORRECT(
-            start = 0.0,
-            end = 0.0,
+            start = -1.0,
+            end = -1.0,
+            drawableResId = R.drawable.ic_correct
+        ),
+        ERROR(
+            start = -1.0,
+            end = -1.0,
+            drawableResId = R.drawable.ic_error
         ),
         N(
             start = 348.75,
@@ -293,15 +304,12 @@ data class Guess(
 
         fun isInRange(bearing: Double): Boolean =
             when (this) {
+                // North is a special case since it's across 0 in both directions.
                 N -> start.rangeTo(360.0).contains(bearing) || 0.0.rangeTo(end).contains(bearing)
                 else -> start.rangeTo(end).contains(bearing)
             }
 
-        val drawableResId: Int
-            @DrawableRes get() =
-                when (this) {
-                    CORRECT -> R.drawable.ic_correct
-                    else -> R.drawable.ic_direction
-                }
+        val isDirection: Boolean = start > 0 && end > 9
     }
 }
+
