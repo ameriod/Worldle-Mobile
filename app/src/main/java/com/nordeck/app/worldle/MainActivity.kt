@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.nordeck.app.worldle.ui.theme.WorldleAndoirdTheme
 import kotlinx.coroutines.launch
@@ -85,7 +84,6 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(state.countryToGuess.vectorAsset)
-                    .decoderFactory(SvgDecoder.Factory())
                     .build(),
                 // That would be cheating...
                 contentDescription = null,
