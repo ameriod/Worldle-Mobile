@@ -1,6 +1,7 @@
 package com.nordeck.app.worldle
 
 import android.content.Context
+import android.location.Location
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,7 +11,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.util.*
-import kotlin.math.floor
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.ln
+import kotlin.math.tan
 
 
 const val MAX_GUESSES = 5
@@ -24,21 +28,71 @@ class GameViewModel(context: Context) : ViewModel() {
     private val countries: List<Country>
 
     init {
-        countries =
-            Json.decodeFromStream<List<Country>>(stream = context.assets.open("countries.json"))
-                .sortedBy { it.name }
+        countries = Json.decodeFromStream<List<Country>>(
+            stream = context.assets.open("countries.json")
+        ).sortedBy { it.name }
 
-        stateChannel.value = State(
-            guessInput = "",
-            suggestions = emptyList(),
-            countryToGuess = countries.first(),
-            guesses = emptyList()
-        )
+        stateChannel.value = createNewGame()
     }
+
+    private fun createNewGame(): State = State(
+        guessInput = "",
+        suggestions = emptyList(),
+        countryToGuess = countries.random(),
+        guesses = emptyList()
+    )
 
     private fun computeProximityPercent(distance: Int): Int {
         val proximity = (MAX_DISTANCE_ON_EARTH - distance).toDouble()
-        return floor((proximity / MAX_DISTANCE_ON_EARTH) * 100).toInt()
+        return ((proximity / MAX_DISTANCE_ON_EARTH) * 100).toInt()
+    }
+
+    private fun getLineBearing(origin: Country, dest: Country): Double {
+        // difference of longitude coords
+        var diffLon = Math.toRadians(dest.longitude) - Math.toRadians(origin.longitude)
+
+        // difference latitude coords phi
+        val diffPhi = ln(
+            tan(
+                Math.toRadians((origin.latitude) / 2 + Math.PI / 4) /
+                        tan(Math.toRadians(origin.longitude)) / 2 + Math.PI / 4
+            )
+        )
+
+        // recalculate diffLon if it is greater than pi
+        if (abs(diffLon) > Math.PI) {
+            if (diffLon > 0) {
+                diffLon = (Math.PI * 2 - diffLon) * -1;
+            } else {
+                diffLon += Math.PI * 2;
+            }
+        }
+
+        //return the angle, normalized
+        return (Math.toDegrees(atan2(diffLon, diffPhi)) + 360) % 360;
+    }
+
+    private fun getDistanceFrom(suggestion: Country, dest: Country): Int =
+        Location("suggestion")
+            .apply {
+                longitude = suggestion.longitude
+                latitude = suggestion.latitude
+            }
+            .distanceTo(Location("country")
+                .apply {
+                    longitude = dest.longitude
+                    latitude = dest.latitude
+                }).toInt()
+
+    private fun getDirection(suggestion: Country, dest: Country): Guess.Direction {
+        return if (suggestion == dest) {
+            Guess.Direction.CORRECT
+        } else {
+            val bearing = getLineBearing(suggestion, dest)
+            // TODO this crashes
+            Guess.Direction.values()
+                .first { it.start.rangeTo(it.end).contains(bearing) }
+        }
     }
 
     fun onGuessUpdated(input: String) {
@@ -66,26 +120,28 @@ class GameViewModel(context: Context) : ViewModel() {
 
     fun onSuggestionSelected(suggestion: Country) {
         stateChannel.value?.let { currentState ->
-            stateChannel.value = currentState.copy(
+            val distanceFrom = getDistanceFrom(suggestion, currentState.countryToGuess)
+
+            val newState = currentState.copy(
                 guessInput = "",
                 suggestions = emptyList(),
                 guesses = currentState.guesses.toMutableList().apply {
                     val newGuess = Guess(
                         country = suggestion,
-                        // TODO
-                        distanceFrom = 0,
-                        // TODO
-                        proximityPercent = 0,
-                        // TODO
-                        direction = if (suggestion == currentState.countryToGuess) {
-                            Guess.Direction.CORRECT
-                        } else {
-                            Guess.Direction.N
-                        }
+                        distanceFromMeters = distanceFrom,
+                        proximityPercent = computeProximityPercent(distanceFrom),
+                        direction = getDirection(suggestion, currentState.countryToGuess)
                     )
                     add(newGuess)
                 }
             )
+            stateChannel.value = when {
+                // TODO won state
+                newState.hasWonGame -> createNewGame()
+                // TODO lost state
+                newState.hasLostGame -> createNewGame()
+                else -> newState
+            }
         }
     }
 
@@ -127,19 +183,17 @@ private const val COMPASS_SEGMENT: Float = 22.5f
 
 data class Guess(
     val country: Country,
-    /**
-     * Distance in meters
-     */
-    private val distanceFrom: Int,
+    private val distanceFromMeters: Int,
     val proximityPercent: Int,
     val direction: Direction
 ) {
 
     fun getDistanceFrom(locale: Locale = Locale.getDefault()): String {
+        val kilometers = distanceFromMeters / 1000
         return if (locale.isMetric()) {
-            "${(distanceFrom / 1000)} km"
+            "${(kilometers)} km"
         } else {
-            "${(distanceFrom * 0.621371).toInt()} mi"
+            "${(kilometers * 0.621371).toInt()} mi"
         }
     }
 
