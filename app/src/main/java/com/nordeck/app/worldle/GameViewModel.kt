@@ -10,6 +10,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import timber.log.Timber
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -62,14 +63,14 @@ class GameViewModel(context: Context) : ViewModel() {
         // recalculate diffLon if it is greater than pi
         if (abs(diffLon) > Math.PI) {
             if (diffLon > 0) {
-                diffLon = (Math.PI * 2 - diffLon) * -1;
+                diffLon = (Math.PI * 2 - diffLon) * -1
             } else {
-                diffLon += Math.PI * 2;
+                diffLon += Math.PI * 2
             }
         }
 
         //return the angle, normalized
-        return (Math.toDegrees(atan2(diffLon, diffPhi)) + 360) % 360;
+        return (Math.toDegrees(atan2(diffLon, diffPhi)) + 360) % 360
     }
 
     private fun getDistanceFrom(suggestion: Country, dest: Country): Int =
@@ -89,9 +90,12 @@ class GameViewModel(context: Context) : ViewModel() {
             Guess.Direction.CORRECT
         } else {
             val bearing = getLineBearing(suggestion, dest)
-            // TODO this crashes
-            Guess.Direction.values()
-                .first { it.start.rangeTo(it.end).contains(bearing) }
+            Guess.Direction.values().filter { it != Guess.Direction.CORRECT }
+                .firstOrNull { it.isInRange(bearing) } ?: run {
+                // TODO this is crashing / not matching one of the directions
+                Timber.e("ERROR direction not found: $bearing")
+                Guess.Direction.CORRECT
+            }
         }
     }
 
@@ -286,6 +290,12 @@ data class Guess(
             end = 348.75,
             rotation = COMPASS_SEGMENT.times(15)
         );
+
+        fun isInRange(bearing: Double): Boolean =
+            when (this) {
+                N -> start.rangeTo(360.0).contains(bearing) || 0.0.rangeTo(end).contains(bearing)
+                else -> start.rangeTo(end).contains(bearing)
+            }
 
         val drawableResId: Int
             @DrawableRes get() =
