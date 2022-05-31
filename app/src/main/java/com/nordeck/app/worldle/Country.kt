@@ -1,6 +1,5 @@
 package com.nordeck.app.worldle
 
-import android.content.Context
 import android.location.Location
 import androidx.annotation.VisibleForTesting
 import kotlinx.serialization.SerialName
@@ -23,9 +22,6 @@ data class Country(
     val name: String
 ) {
     val vectorAsset = "file:///android_asset/${code.lowercase()}/vector.svg"
-
-    fun hasImage(context: Context): Boolean =
-        code.isNotEmpty() && context.resources.assets.list(code)?.isNotEmpty() ?: false
 
     @VisibleForTesting
     fun getLineBearingTo(dest: Country): Double {

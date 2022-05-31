@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import kotlin.random.Random
 
 class GameViewModel(context: Context) : ViewModel() {
 
@@ -23,11 +26,13 @@ class GameViewModel(context: Context) : ViewModel() {
             // Only use countries with images
             assets.firstOrNull { it.equals(country.code, true) } != null
         }.sortedBy { it.name }
-
-        stateLiveData.value = createNewGame()
+        // Use the date as the seed with the number of countries.
+        val formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        val seed = "$formattedDate+${countries.size}".hashCode()
+        stateLiveData.value = createNewGame(countries.random(Random(seed)))
     }
 
-    private fun createNewGame(countryToGuess: Country = countries.random()): State {
+    private fun createNewGame(countryToGuess: Country): State {
         Timber.d("New game: $countryToGuess")
         return State(
             guessInput = "",
