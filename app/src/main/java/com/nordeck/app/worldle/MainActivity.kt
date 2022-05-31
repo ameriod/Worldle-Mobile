@@ -93,32 +93,14 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                         .fillMaxWidth()
                         .background(MaterialTheme.colors.primary)
                 )
-
                 if (state.hasLostGame) {
-                    Snackbar(Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Image(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(id = R.drawable.ic_error),
-                                colorFilter = ColorFilter.tint(Color.Red),
-                                contentDescription = null
-                            )
-                            Text(
-                                modifier = Modifier.weight(1.0f),
-                                textAlign = TextAlign.Center,
-                                text = state.countryToGuess.name
-                            )
-                            Image(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(id = R.drawable.ic_error),
-                                colorFilter = ColorFilter.tint(Color.Red),
-                                contentDescription = null
-                            )
-                        }
-                    }
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.FillHeight,
+                        painter = painterResource(id = R.drawable.ic_error),
+                        colorFilter = ColorFilter.tint(Color.Red),
+                        contentDescription = null
+                    )
                 }
             }
         }
@@ -140,6 +122,20 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
         when {
             state.hasWonGame || state.hasLostGame -> {
                 item {
+                    if (state.hasLostGame) {
+                        Snackbar(Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    modifier = Modifier.weight(1.0f),
+                                    textAlign = TextAlign.Center,
+                                    text = state.countryToGuess.name
+                                )
+                            }
+                        }
+                    }
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
