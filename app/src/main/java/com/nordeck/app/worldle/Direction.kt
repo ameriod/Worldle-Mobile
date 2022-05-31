@@ -28,7 +28,6 @@ enum class Direction(
     NNE(
         start = 11.25,
         end = 33.75,
-        // TODO calculate the rotation with the start and end
         rotation = COMPASS_SEGMENT
     ),
     NE(

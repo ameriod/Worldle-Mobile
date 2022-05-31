@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,6 +29,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -81,18 +79,48 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
         state = listState
     ) {
         item {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(state.countryToGuess.vectorAsset)
-                    .build(),
-                // That would be cheating...
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .height(COUNTRY_HEIGHT)
-                    .fillMaxWidth()
-                    .background(Color.Blue)
-            )
+            Box {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(state.countryToGuess.vectorAsset)
+                        .build(),
+                    // That would be cheating...
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.White),
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .height(COUNTRY_HEIGHT)
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.primary)
+                )
+
+                if (state.hasLostGame) {
+                    Snackbar(Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(id = R.drawable.ic_error),
+                                colorFilter = ColorFilter.tint(Color.Red),
+                                contentDescription = null
+                            )
+                            Text(
+                                modifier = Modifier.weight(1.0f),
+                                textAlign = TextAlign.Center,
+                                text = state.countryToGuess.name
+                            )
+                            Image(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(id = R.drawable.ic_error),
+                                colorFilter = ColorFilter.tint(Color.Red),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         state.guesses.forEach { guess ->
@@ -109,30 +137,56 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
             }
         }
 
-        item {
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onFocusEvent {
-                        if (it.hasFocus && state.guesses.isNotEmpty()) {
-                            coroutineScope.launch {
-                                // Scroll down
-                                listState.animateScrollToItem(0, COUNTRY_HEIGHT.value.toInt())
-                            }
-                        }
-                    },
-                value = state.guessInput,
-                onValueChange = {
-                    viewModel.onGuessUpdated(it)
-                },
-                keyboardActions = KeyboardActions {
-                    viewModel.onGuessDone()
-                },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = if (state.guessInput.isEmpty()) ImeAction.None else ImeAction.Done
-                ),
-                singleLine = true,
-            )
+        when {
+            state.hasWonGame || state.hasLostGame -> {
+                item {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            ),
+                        onClick = {
+                            // TODO share logic
+                        }) {
+                        Text(text = "Share")
+                    }
+                }
+            }
+            else -> {
+                item {
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusEvent {
+                                if (it.hasFocus && state.guesses.isNotEmpty()) {
+                                    coroutineScope.launch {
+                                        // Scroll down
+                                        listState.animateScrollToItem(
+                                            0,
+                                            COUNTRY_HEIGHT.value.toInt()
+                                        )
+                                    }
+                                }
+                            },
+                        value = state.guessInput,
+                        placeholder = {
+                            Text(text = "Country, territory...")
+                        },
+                        onValueChange = {
+                            viewModel.onGuessUpdated(it)
+                        },
+                        keyboardActions = KeyboardActions {
+                            viewModel.onGuessDone()
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = if (state.guessInput.isEmpty()) ImeAction.None else ImeAction.Done
+                        ),
+                        singleLine = true,
+                    )
+                }
+            }
         }
 
         state.suggestions.forEach { suggestion ->
@@ -171,16 +225,17 @@ private fun GuessView(modifier: Modifier = Modifier, guess: Guess) {
 
         Text(text = guess.getDistanceFrom())
 
-        Text(text = "${guess.proximityPercent}%")
-
         Image(
             modifier = Modifier
                 .size(24.dp)
                 .rotate(guess.direction.rotation),
             painter = painterResource(id = guess.direction.drawableResId),
             contentDescription = guess.direction.name,
-            colorFilter = ColorFilter.tint(Color.Blue)
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
         )
+
+        Text(text = "${guess.proximityPercent}%")
+
     }
 }
 

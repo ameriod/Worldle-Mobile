@@ -1,5 +1,6 @@
 package com.nordeck.app.worldle
 
+import android.content.Context
 import android.location.Location
 import androidx.annotation.VisibleForTesting
 import kotlinx.serialization.SerialName
@@ -23,6 +24,9 @@ data class Country(
 ) {
     val vectorAsset = "file:///android_asset/${code.lowercase()}/vector.svg"
 
+    fun hasImage(context: Context): Boolean =
+        code.isNotEmpty() && context.resources.assets.list(code)?.isNotEmpty() ?: false
+
     @VisibleForTesting
     fun getLineBearingTo(dest: Country): Double {
         // difference of longitude coordinates
@@ -30,8 +34,8 @@ data class Country(
         // difference latitude coordinates phi
         val diffPhi = ln(
             tan(
-                Math.toRadians((latitude) / 2 + Math.PI / 4) /
-                        tan(Math.toRadians(longitude)) / 2 + Math.PI / 4
+                Math.toRadians((dest.latitude) / (2 + Math.PI) / 4) /
+                        tan(Math.toRadians(longitude)) / (2 + Math.PI) / 4
             )
         )
         // recalculate diffLon if it is greater than pi
@@ -42,7 +46,7 @@ data class Country(
                 diffLon += Math.PI * 2
             }
         }
-        //return the angle, normalized
+        // return the angle, normalized
         return (Math.toDegrees(atan2(diffLon, diffPhi)) + 360) % 360
     }
 
@@ -64,11 +68,12 @@ data class Country(
             Direction.CORRECT
         } else {
             val bearing = getLineBearingTo(dest)
+            Timber.d("Bearing: $bearing")
             // Make sure we only use real "Direction"
             Direction.values().filter { it.isDirection }
                 .firstOrNull { it.isInRange(bearing) } ?: run {
                 // This should never happen, but if it does, do not crash.
-                Timber.e("ERROR bearing not in range: $bearing")
+                Timber.e("Bearing not in range: $bearing dest: $dest to: ${this@Country}")
                 Direction.ERROR
             }
         }

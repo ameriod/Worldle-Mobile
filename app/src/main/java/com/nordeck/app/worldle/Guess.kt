@@ -26,4 +26,3 @@ private fun Locale.isMetric(): Boolean {
         else -> true
     }
 }
-

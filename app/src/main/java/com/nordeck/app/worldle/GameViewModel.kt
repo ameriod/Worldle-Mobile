@@ -6,34 +6,40 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import timber.log.Timber
 
 class GameViewModel(context: Context) : ViewModel() {
 
-    private val stateChannel = MutableLiveData<State>()
-    val state: LiveData<State> = stateChannel
+    private val stateLiveData = MutableLiveData<State>()
+    val state: LiveData<State> = stateLiveData
 
     private val countries: List<Country>
 
     init {
+        val assets = context.assets.list("")!!
         countries = Json.decodeFromStream<List<Country>>(
             stream = context.assets.open("countries.json")
-        ).sortedBy { it.name }
+        ).filter { country ->
+            // Only use countries with images
+            assets.firstOrNull { it.equals(country.code, true) } != null
+        }.sortedBy { it.name }
 
-        stateChannel.value = createNewGame(
-            countryToGuess = countries.random()
+        stateLiveData.value = createNewGame()
+    }
+
+    private fun createNewGame(countryToGuess: Country = countries.random()): State {
+        Timber.d("New game: $countryToGuess")
+        return State(
+            guessInput = "",
+            suggestions = emptyList(),
+            countryToGuess = countryToGuess,
+            guesses = emptyList()
         )
     }
 
-    private fun createNewGame(countryToGuess: Country): State = State(
-        guessInput = "",
-        suggestions = emptyList(),
-        countryToGuess = countryToGuess,
-        guesses = emptyList()
-    )
-
     fun onGuessUpdated(input: String) {
-        stateChannel.value?.let { currentState ->
-            stateChannel.value = currentState.copy(
+        stateLiveData.value?.let { currentState ->
+            stateLiveData.value = currentState.copy(
                 guessInput = input,
                 suggestions = if (input.isEmpty()) {
                     emptyList()
@@ -49,13 +55,13 @@ class GameViewModel(context: Context) : ViewModel() {
     }
 
     fun onGuessDone() {
-        stateChannel.value?.suggestions?.firstOrNull()?.let {
+        stateLiveData.value?.suggestions?.firstOrNull()?.let {
             onSuggestionSelected(it)
         }
     }
 
     fun onSuggestionSelected(suggestion: Country) {
-        stateChannel.value?.let { currentState ->
+        stateLiveData.value?.let { currentState ->
             val distanceFrom = suggestion.getDistanceTo(currentState.countryToGuess)
 
             val newState = currentState.copy(
@@ -71,13 +77,7 @@ class GameViewModel(context: Context) : ViewModel() {
                     add(newGuess)
                 }
             )
-            stateChannel.value = when {
-                // TODO won state
-                newState.hasWonGame -> createNewGame(countries.first())
-                // TODO lost state
-                newState.hasLostGame -> createNewGame(countries.last())
-                else -> newState
-            }
+            stateLiveData.value = newState
         }
     }
 
@@ -88,7 +88,7 @@ class GameViewModel(context: Context) : ViewModel() {
         val guesses: List<Guess>
     ) {
 
-        val hasLostGame: Boolean = guesses.size > MAX_GUESSES
+        val hasLostGame: Boolean = guesses.size >= MAX_GUESSES
 
         val hasWonGame: Boolean = guesses.any { it.country == countryToGuess }
     }
