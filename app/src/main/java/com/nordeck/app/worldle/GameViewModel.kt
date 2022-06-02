@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.squareup.sqldelight.android.AndroidSqliteDriver
+import com.squareup.sqldelight.db.SqlDriver
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import timber.log.Timber
@@ -17,8 +19,10 @@ class GameViewModel(context: Context) : ViewModel() {
     val state: LiveData<State> = stateLiveData
 
     private val countries: List<Country>
+    private val dateSeed: String
 
     init {
+      //  val driver: SqlDriver = AndroidSqliteDriver(History.Schema, context, "history.db")
         val assets = context.assets.list("")!!
         countries = Json.decodeFromStream<List<Country>>(
             stream = context.assets.open("countries.json")
@@ -27,8 +31,8 @@ class GameViewModel(context: Context) : ViewModel() {
             assets.firstOrNull { it.equals(country.code, true) } != null
         }.sortedBy { it.name }
         // Use the date as the seed with the number of countries.
-        val formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-        val seed = "$formattedDate+${countries.size}".hashCode()
+        dateSeed = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        val seed = "$dateSeed+${countries.size}".hashCode()
         stateLiveData.value = createNewGame(countries.random(Random(seed)))
     }
 

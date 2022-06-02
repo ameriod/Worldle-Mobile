@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-
                     when (val state = viewModel.state.observeAsState().value) {
                         null -> GameLoadingView()
                         // TODO game over view
