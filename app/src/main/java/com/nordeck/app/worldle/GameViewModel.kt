@@ -5,46 +5,39 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nordeck.app.worldle.db.History
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
 import timber.log.Timber
-import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
 class GameViewModel(
     context: Context,
-    private val historyDatabase: HistoryDatabase = (context as AppApplication).historyDatabase
+    private val repository: Repository = Repository(context = context)
 ) : ViewModel() {
 
     private val stateLiveData = MutableLiveData<State>()
     val state: LiveData<State> = stateLiveData
 
     private val countries: List<Country>
-    private val dateSeed: String
+    private val date: String
 
     init {
-        val assets = context.assets.list("")!!
-        countries = Json.decodeFromStream<List<Country>>(
-            stream = context.assets.open("countries.json")
-        ).filter { country ->
-            // Only use countries with images
-            assets.firstOrNull { it.equals(country.code, true) } != null
-        }.sortedBy { it.name }
+        countries = repository.getCountries()
         // Use the date as the seed with the number of countries.
-        dateSeed = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-        val restoredGame =
-            historyDatabase.historyQueries.selectByDate(dateSeed).executeAsOneOrNull()?.let {
-                restoreGame(it)
-            }
-        stateLiveData.value = if (restoredGame == null) {
-            val seed = "$dateSeed+${countries.size}".hashCode()
-            val state = createNewGame(countries.random(Random(seed)))
-            saveState(state)
-            state
-        } else {
-            restoredGame
+        date = ZonedDateTime.now(ZoneId.of("US/Eastern"))
+            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        val restoredGame = repository.getSavedGame(date)?.let {
+            restoreGame(it)
         }
+        updateState(
+            if (restoredGame == null) {
+                val seed = "$date+${countries.size}".hashCode()
+                createNewGame(countries.random(Random(seed)))
+            } else {
+                restoredGame
+            }
+        )
     }
 
     private fun restoreGame(history: History): State? {
@@ -57,13 +50,7 @@ class GameViewModel(
                     guess.equals(country.code, true)
                 }
             }.map { suggestion ->
-                val distanceFrom = suggestion.getDistanceTo(countryToGuess)
-                Guess(
-                    country = suggestion,
-                    distanceFromMeters = distanceFrom,
-                    proximityPercent = computeProximityPercent(distanceFrom),
-                    direction = suggestion.getDirectionTo(countryToGuess)
-                )
+                suggestion.toGuess(countryToGuess = countryToGuess)
             }
             State(
                 guessInput = "",
@@ -99,8 +86,7 @@ class GameViewModel(
                     }
                 }
             )
-            saveState(newState)
-            stateLiveData.value = newState
+            updateState(newState)
         }
     }
 
@@ -112,33 +98,31 @@ class GameViewModel(
 
     fun onSuggestionSelected(suggestion: Country) {
         stateLiveData.value?.let { currentState ->
-            val distanceFrom = suggestion.getDistanceTo(currentState.countryToGuess)
-
             val newState = currentState.copy(
                 guessInput = "",
                 suggestions = emptyList(),
                 guesses = currentState.guesses.toMutableList().apply {
-                    val newGuess = Guess(
-                        country = suggestion,
-                        distanceFromMeters = distanceFrom,
-                        proximityPercent = computeProximityPercent(distanceFrom),
-                        direction = suggestion.getDirectionTo(currentState.countryToGuess)
-                    )
+                    val newGuess = suggestion.toGuess(countryToGuess = currentState.countryToGuess)
                     add(newGuess)
                 }
             )
-            saveState(newState)
-            stateLiveData.value = newState
+            updateState(newState)
         }
     }
 
-    private fun saveState(state: State) {
-        val history = state.toHistory(dateSeed)
-        historyDatabase.historyQueries.insertOrUpdate(
-            guesses = history.guesses,
-            country = history.country,
-            date = history.date
+    private fun Country.toGuess(countryToGuess: Country): Guess {
+        val distanceFrom = this.getDistanceTo(countryToGuess)
+        return Guess(
+            country = this,
+            distanceFromMeters = distanceFrom,
+            proximityPercent = computeProximityPercent(distanceFrom),
+            direction = this.getDirectionTo(countryToGuess)
         )
+    }
+
+    private fun updateState(newState: State) {
+        repository.saveOrUpdate(newState.toHistory(date))
+        stateLiveData.value = newState
     }
 
     data class State(

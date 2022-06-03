@@ -93,15 +93,6 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                         .background(MaterialTheme.colors.primary)
                         .padding(16.dp)
                 )
-                if (state.hasLostGame) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillHeight,
-                        painter = painterResource(id = R.drawable.ic_error),
-                        colorFilter = ColorFilter.tint(Color.Red),
-                        contentDescription = null
-                    )
-                }
             }
         }
 
