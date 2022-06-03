@@ -1,16 +1,13 @@
 import kotlin.collections.List;
 
 CREATE TABLE History (
-  date TEXT NOT NULL,
+  date TEXT NOT NULL PRIMARY KEY,
   country TEXT NOT NULL,
-  guesses TEXT AS List<String>
+  guesses TEXT AS List<String> NOT NULL
 );
-
-selectAll:
-SELECT * FROM History;
 
 selectByDate:
 SELECT * FROM History WHERE date =?;
 
 insertOrUpdate:
-INSERT OR REPLACE INTO History(date, country, guesses) VALUES(?,?,?);
+INSERT OR REPLACE INTO History(date, country, guesses)VALUES(?,?,?);

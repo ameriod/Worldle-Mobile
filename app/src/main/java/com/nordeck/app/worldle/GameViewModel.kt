@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.squareup.sqldelight.android.AndroidSqliteDriver
-import com.squareup.sqldelight.db.SqlDriver
+import com.nordeck.app.worldle.db.History
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import timber.log.Timber
@@ -13,7 +12,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-class GameViewModel(context: Context) : ViewModel() {
+class GameViewModel(
+    context: Context,
+    private val historyDatabase: HistoryDatabase = (context as AppApplication).historyDatabase
+) : ViewModel() {
 
     private val stateLiveData = MutableLiveData<State>()
     val state: LiveData<State> = stateLiveData
@@ -22,7 +24,6 @@ class GameViewModel(context: Context) : ViewModel() {
     private val dateSeed: String
 
     init {
-      //  val driver: SqlDriver = AndroidSqliteDriver(History.Schema, context, "history.db")
         val assets = context.assets.list("")!!
         countries = Json.decodeFromStream<List<Country>>(
             stream = context.assets.open("countries.json")
@@ -32,9 +33,47 @@ class GameViewModel(context: Context) : ViewModel() {
         }.sortedBy { it.name }
         // Use the date as the seed with the number of countries.
         dateSeed = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-        val seed = "$dateSeed+${countries.size}".hashCode()
-        stateLiveData.value = createNewGame(countries.random(Random(seed)))
+        val restoredGame =
+            historyDatabase.historyQueries.selectByDate(dateSeed).executeAsOneOrNull()?.let {
+                restoreGame(it)
+            }
+        stateLiveData.value = if (restoredGame == null) {
+            val seed = "$dateSeed+${countries.size}".hashCode()
+            val state = createNewGame(countries.random(Random(seed)))
+            saveState(state)
+            state
+        } else {
+            restoredGame
+        }
     }
+
+    private fun restoreGame(history: History): State? {
+        val countryToGuess = countries.firstOrNull { countryToGuess ->
+            countryToGuess.code.equals(history.country, true)
+        }
+        return countryToGuess?.let {
+            val guesses = history.guesses.mapNotNull { guess ->
+                countries.firstOrNull { country ->
+                    guess.equals(country.code, true)
+                }
+            }.map { suggestion ->
+                val distanceFrom = suggestion.getDistanceTo(countryToGuess)
+                Guess(
+                    country = suggestion,
+                    distanceFromMeters = distanceFrom,
+                    proximityPercent = computeProximityPercent(distanceFrom),
+                    direction = suggestion.getDirectionTo(countryToGuess)
+                )
+            }
+            State(
+                guessInput = "",
+                suggestions = emptyList(),
+                countryToGuess = it,
+                guesses = guesses
+            )
+        }
+    }
+
 
     private fun createNewGame(countryToGuess: Country): State {
         Timber.d("New game: $countryToGuess")
@@ -48,7 +87,7 @@ class GameViewModel(context: Context) : ViewModel() {
 
     fun onGuessUpdated(input: String) {
         stateLiveData.value?.let { currentState ->
-            stateLiveData.value = currentState.copy(
+            val newState = currentState.copy(
                 guessInput = input,
                 suggestions = if (input.isEmpty()) {
                     emptyList()
@@ -60,6 +99,8 @@ class GameViewModel(context: Context) : ViewModel() {
                     }
                 }
             )
+            saveState(newState)
+            stateLiveData.value = newState
         }
     }
 
@@ -86,8 +127,18 @@ class GameViewModel(context: Context) : ViewModel() {
                     add(newGuess)
                 }
             )
+            saveState(newState)
             stateLiveData.value = newState
         }
+    }
+
+    private fun saveState(state: State) {
+        val history = state.toHistory(dateSeed)
+        historyDatabase.historyQueries.insertOrUpdate(
+            guesses = history.guesses,
+            country = history.country,
+            date = history.date
+        )
     }
 
     data class State(
@@ -100,6 +151,13 @@ class GameViewModel(context: Context) : ViewModel() {
         val hasLostGame: Boolean = guesses.size >= MAX_GUESSES
 
         val hasWonGame: Boolean = guesses.any { it.country == countryToGuess }
+
+        fun toHistory(date: String): History =
+            History(
+                date = date,
+                country = countryToGuess.code,
+                guesses = guesses.map { it.country.code }
+            )
     }
 
     companion object {

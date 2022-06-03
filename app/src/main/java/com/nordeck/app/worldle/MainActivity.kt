@@ -91,6 +91,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                         .height(COUNTRY_HEIGHT)
                         .fillMaxWidth()
                         .background(MaterialTheme.colors.primary)
+                        .padding(16.dp)
                 )
                 if (state.hasLostGame) {
                     Image(

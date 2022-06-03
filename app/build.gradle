@@ -48,8 +48,8 @@ android {
 }
 
 sqldelight {
-    History {
-        packageName = "com.nordeck.app.worldle.db"
+    HistoryDatabase {
+        packageName = "com.nordeck.app.worldle"
     }
 }
 
