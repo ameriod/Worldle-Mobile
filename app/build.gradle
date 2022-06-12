@@ -21,7 +21,13 @@ android {
             useSupportLibrary true
         }
     }
-
+    sourceSets {
+        test {
+            resources {
+                srcDirs += "src/main/assets"
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false

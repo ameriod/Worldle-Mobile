@@ -1,6 +1,7 @@
 package com.nordeck.app.worldle.model
 
 import com.nordeck.app.worldle.HistoryDatabase
+import com.nordeck.app.worldle.db.History
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream

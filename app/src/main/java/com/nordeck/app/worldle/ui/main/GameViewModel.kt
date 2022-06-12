@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nordeck.app.worldle.db.History
 import com.nordeck.app.worldle.model.Country
 import com.nordeck.app.worldle.model.Guess
-import com.nordeck.app.worldle.model.History
 import com.nordeck.app.worldle.model.Repository
 import kotlinx.coroutines.launch
 import timber.log.Timber

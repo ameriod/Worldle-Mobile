@@ -4,9 +4,9 @@ import android.app.Application
 import coil.Coil
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import com.nordeck.app.worldle.db.History
 import com.nordeck.app.worldle.model.AssetsFileLoader
 import com.nordeck.app.worldle.model.FileLoader
-import com.nordeck.app.worldle.model.History
 import com.nordeck.app.worldle.model.Repository
 import com.nordeck.app.worldle.model.listOfStringsAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
