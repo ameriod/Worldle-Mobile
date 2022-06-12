@@ -25,24 +25,5 @@ class AssetsFileLoader(
         }
 
     override fun getInputStreamFromFile(fileName: String): InputStream =
-        context.assets.open("countries.json")
-}
-
-class ResourceFileLoader : FileLoader {
-    override fun getAllFilesInPath(path: String): Array<String> =
-        this.javaClass.classLoader!!.getResources(path)
-            .toList()
-            .map {
-                it.toString()
-            }
-            .toTypedArray()
-
-    override fun getInputStreamFromFile(fileName: String): InputStream =
-        this.javaClass.classLoader!!.getResourceAsStream("")
-
-    override fun getStringFromFile(fileName: String): String = getInputStreamFromFile(fileName)
-        .bufferedReader()
-        .use {
-            it.readText()
-        }
+        context.assets.open(fileName)
 }

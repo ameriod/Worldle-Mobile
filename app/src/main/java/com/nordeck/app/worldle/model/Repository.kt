@@ -1,5 +1,6 @@
 package com.nordeck.app.worldle.model
 
+import androidx.annotation.VisibleForTesting
 import com.nordeck.app.worldle.HistoryDatabase
 import com.nordeck.app.worldle.db.History
 import kotlinx.coroutines.coroutineScope
@@ -13,18 +14,7 @@ class Repository(
 ) {
 
     suspend fun getCountries(): List<Country> = coroutineScope {
-        val assets = fileLoader.getAllFilesInPath("")
-        Json.decodeFromStream<List<Country>>(
-            stream = fileLoader.getInputStreamFromFile("countries.json")
-        ).filter { country ->
-            // Only use countries with images
-            if (assets.firstOrNull { it.equals(country.code, true) } != null) {
-                true
-            } else {
-                Timber.d("ERROR: ${country.code}")
-                false
-            }
-        }.sortedBy { it.name }
+        getCountriesInternal(fileLoader)
     }
 
     suspend fun getSavedGame(date: String): History? = coroutineScope {
@@ -37,5 +27,25 @@ class Repository(
             country = history.country,
             date = history.date
         )
+    }
+
+    companion object {
+
+        @VisibleForTesting
+        fun getCountriesInternal(fileLoader: FileLoader): List<Country> {
+            val assets = fileLoader.getAllFilesInPath("").map { it.replace("/vector.svg", "") }
+            val json = fileLoader.getStringFromFile("countries.json")
+            return Json.decodeFromStream<List<Country>>(
+                stream = fileLoader.getInputStreamFromFile("countries.json")
+            ).filter { country ->
+                // Only use countries with images
+                if (assets.firstOrNull { it.equals(country.code, true) } != null) {
+                    true
+                } else {
+                    Timber.d("ERROR: ${country.code}")
+                    false
+                }
+            }.sortedBy { it.name }
+        }
     }
 }

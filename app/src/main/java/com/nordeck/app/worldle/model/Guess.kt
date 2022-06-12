@@ -1,5 +1,7 @@
 package com.nordeck.app.worldle.model
 
+import com.nordeck.app.worldle.ConversionMath
+import com.nordeck.app.worldle.isMetric
 import java.util.Locale
 
 data class Guess(
@@ -10,19 +12,10 @@ data class Guess(
 ) {
 
     fun getDistanceFrom(locale: Locale = Locale.getDefault()): String {
-        val kilometers = distanceFromMeters / 1000
         return if (locale.isMetric()) {
-            "${(kilometers)} km"
+            "${(ConversionMath.metersToKilometers(distanceFromMeters))} km"
         } else {
-            "${(kilometers * 0.621371).toInt()} mi"
+            "${(ConversionMath.metersToMiles(distanceFromMeters))} mi"
         }
-    }
-}
-
-private fun Locale.isMetric(): Boolean {
-    return when (country.uppercase(this)) {
-        // Only the best countries right here.
-        "US", "LR", "MM" -> false
-        else -> true
     }
 }

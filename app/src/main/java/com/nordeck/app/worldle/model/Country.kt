@@ -19,14 +19,6 @@ data class Country(
 ) {
     val vectorAsset = "file:///android_asset/${code.lowercase()}/vector.svg"
 
-    @VisibleForTesting
-    fun getLineBearingTo(dest: Country): Double = GeoMath.headingFromTwoPoints(
-        lat1 = latitude,
-        lon1 = longitude,
-        lat2 = dest.latitude,
-        lon2 = dest.longitude
-    )
-
     fun getDistanceTo(dest: Country): Int = GeoMath.distance(
         lat1 = latitude,
         long1 = longitude,
@@ -38,7 +30,12 @@ data class Country(
         return if (this == dest) {
             Direction.CORRECT
         } else {
-            val bearing = getLineBearingTo(dest)
+            val bearing = GeoMath.headingFromTwoPoints(
+                lat1 = latitude,
+                lon1 = longitude,
+                lat2 = dest.latitude,
+                lon2 = dest.longitude
+            )
             Timber.d("Bearing: $bearing")
             // Make sure we only use real "Direction"
             Direction.values().filter { it.isDirection }
