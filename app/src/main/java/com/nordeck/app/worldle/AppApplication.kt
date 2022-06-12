@@ -41,10 +41,12 @@ class AppApplication : Application() {
 
         Timber.plant(Timber.DebugTree())
 
-        Coil.setImageLoader(ImageLoader.Builder(this)
-            .components {
-                add(SvgDecoder.Factory())
-            }
-            .build())
+        Coil.setImageLoader(
+            ImageLoader.Builder(this)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
+        )
     }
 }

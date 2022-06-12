@@ -37,5 +37,4 @@ class Repository(
             date = history.date
         )
     }
-
 }

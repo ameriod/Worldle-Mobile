@@ -31,7 +31,7 @@ data class Country(
         val diffPhi = ln(
             tan(
                 Math.toRadians((dest.latitude) / (2 + Math.PI) / 4) /
-                        tan(Math.toRadians(longitude)) / (2 + Math.PI) / 4
+                    tan(Math.toRadians(longitude)) / (2 + Math.PI) / 4
             )
         )
         // recalculate diffLon if it is greater than pi
@@ -57,7 +57,8 @@ data class Country(
                     .apply {
                         longitude = dest.longitude
                         latitude = dest.latitude
-                    }).toInt()
+                    }
+            ).toInt()
 
     fun getDirectionTo(dest: Country): Direction {
         return if (this == dest) {

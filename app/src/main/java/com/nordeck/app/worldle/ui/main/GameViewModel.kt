@@ -41,7 +41,6 @@ class GameViewModel(
                 }
             )
         }
-
     }
 
     fun resetGame() {
@@ -75,7 +74,6 @@ class GameViewModel(
         }
     }
 
-
     private fun createNewGame(countryToGuess: Country): State {
         Timber.d("New game: $countryToGuess")
 
@@ -97,8 +95,8 @@ class GameViewModel(
                 } else {
                     currentState.allCountries.filter { country ->
                         country.name.contains(input, true) &&
-                                // Do not show an already selected country.
-                                !currentState.guesses.any { it.country == country }
+                            // Do not show an already selected country.
+                            !currentState.guesses.any { it.country == country }
                     }
                 }
             )

@@ -242,18 +242,13 @@ private fun GuessView(modifier: Modifier = Modifier, guess: Guess) {
         )
 
         Text(text = "${guess.proximityPercent}%")
-
     }
 }
 
 private fun Country.highlightGuess(input: String, highlightColor: Color): AnnotatedString =
     buildAnnotatedString {
         // TODO this is not working
-        val parts = name.split(
-            Regex(
-                pattern = "((?=${name})|(?<=${name}))"
-            )
-        )
+        val parts = name.split(Regex("((?=${name})|(?<=${name}))")) // ktlint-disable
         parts.forEach {
             if (it.equals(input, true)) {
                 withStyle(

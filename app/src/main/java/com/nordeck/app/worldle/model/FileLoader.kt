@@ -10,7 +10,6 @@ interface FileLoader {
     fun getInputStreamFromFile(fileName: String): InputStream
 
     fun getStringFromFile(fileName: String): String
-
 }
 
 class AssetsFileLoader(

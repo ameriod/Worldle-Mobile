@@ -1,6 +1,6 @@
 package com.nordeck.app.worldle.model
 
-import java.util.*
+import java.util.Locale
 
 data class Guess(
     val country: Country,
