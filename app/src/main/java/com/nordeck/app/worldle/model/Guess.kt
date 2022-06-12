@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle
+package com.nordeck.app.worldle.model
 
 import java.util.*
 

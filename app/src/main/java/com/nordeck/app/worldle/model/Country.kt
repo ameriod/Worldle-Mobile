@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle
+package com.nordeck.app.worldle.model
 
 import android.location.Location
 import androidx.annotation.VisibleForTesting

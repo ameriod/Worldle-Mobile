@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.squareup.sqldelight'
+    id 'org.jlleitschuh.gradle.ktlint'
 }
 
 android {

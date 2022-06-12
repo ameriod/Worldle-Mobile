@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle.db
+package com.nordeck.app.worldle.model
 
 import com.squareup.sqldelight.ColumnAdapter
 

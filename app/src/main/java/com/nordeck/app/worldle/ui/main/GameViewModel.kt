@@ -1,10 +1,14 @@
-package com.nordeck.app.worldle
+package com.nordeck.app.worldle.ui.main
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.nordeck.app.worldle.db.History
+import androidx.lifecycle.viewModelScope
+import com.nordeck.app.worldle.model.Country
+import com.nordeck.app.worldle.model.Guess
+import com.nordeck.app.worldle.model.History
+import com.nordeck.app.worldle.model.Repository
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -12,59 +16,71 @@ import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
 class GameViewModel(
-    context: Context,
-    private val repository: Repository = Repository(context = context)
+    private val repository: Repository
 ) : ViewModel() {
 
     private val stateLiveData = MutableLiveData<State>()
     val state: LiveData<State> = stateLiveData
-
-    private val countries: List<Country>
-    private val date: String
+    private val date: String by lazy(LazyThreadSafetyMode.NONE) {
+        ZonedDateTime.now(ZoneId.of("US/Eastern"))
+            .format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))
+    }
 
     init {
-        countries = repository.getCountries()
-        // Use the date as the seed with the number of countries.
-        date = ZonedDateTime.now(ZoneId.of("US/Eastern"))
-            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-        val restoredGame = repository.getSavedGame(date)?.let {
-            restoreGame(it)
-        }
-        updateState(
-            if (restoredGame == null) {
-                val seed = "$date+${countries.size}".hashCode()
-                createNewGame(countries.random(Random(seed)))
-            } else {
-                restoredGame
+        viewModelScope.launch {
+            val countries = repository.getCountries()
+            val restoredGame = repository.getSavedGame(date)?.let {
+                restoreGame(it)
             }
-        )
+            updateState(
+                if (restoredGame == null) {
+                    val seed = "$date+${countries.size}".hashCode()
+                    createNewGame(countries.random(Random(seed)))
+                } else {
+                    restoredGame
+                }
+            )
+        }
+
+    }
+
+    fun resetGame() {
+        state.value?.allCountries?.run {
+            val seed = "$date+${this.size}".hashCode()
+            updateState(createNewGame(this.random(Random(seed))))
+        }
     }
 
     private fun restoreGame(history: History): State? {
-        val countryToGuess = countries.firstOrNull { countryToGuess ->
-            countryToGuess.code.equals(history.country, true)
-        }
-        return countryToGuess?.let {
-            val guesses = history.guesses.mapNotNull { guess ->
-                countries.firstOrNull { country ->
-                    guess.equals(country.code, true)
-                }
-            }.map { suggestion ->
-                suggestion.toGuess(countryToGuess = countryToGuess)
+        return state.value?.allCountries?.let { countries ->
+            val countryToGuess = countries.firstOrNull { countryToGuess ->
+                countryToGuess.code.equals(history.country, true)
             }
-            State(
-                guessInput = "",
-                suggestions = emptyList(),
-                countryToGuess = it,
-                guesses = guesses
-            )
+            countryToGuess?.let {
+                val guesses = history.guesses.mapNotNull { guess ->
+                    countries.firstOrNull { country ->
+                        guess.equals(country.code, true)
+                    }
+                }.map { suggestion ->
+                    suggestion.toGuess(countryToGuess = countryToGuess)
+                }
+                State(
+                    allCountries = countries,
+                    guessInput = "",
+                    suggestions = emptyList(),
+                    countryToGuess = it,
+                    guesses = guesses
+                )
+            }
         }
     }
 
 
     private fun createNewGame(countryToGuess: Country): State {
         Timber.d("New game: $countryToGuess")
+
         return State(
+            allCountries = state.value?.allCountries ?: emptyList(),
             guessInput = "",
             suggestions = emptyList(),
             countryToGuess = countryToGuess,
@@ -79,7 +95,7 @@ class GameViewModel(
                 suggestions = if (input.isEmpty()) {
                     emptyList()
                 } else {
-                    countries.filter { country ->
+                    currentState.allCountries.filter { country ->
                         country.name.contains(input, true) &&
                                 // Do not show an already selected country.
                                 !currentState.guesses.any { it.country == country }
@@ -121,11 +137,14 @@ class GameViewModel(
     }
 
     private fun updateState(newState: State) {
-        repository.saveOrUpdate(newState.toHistory(date))
+        viewModelScope.launch {
+            repository.saveOrUpdate(newState.toHistory(date))
+        }
         stateLiveData.value = newState
     }
 
     data class State(
+        val allCountries: List<Country>,
         val guessInput: String,
         val suggestions: List<Country>,
         val countryToGuess: Country,
