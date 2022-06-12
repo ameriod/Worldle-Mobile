@@ -4,6 +4,8 @@ import com.nordeck.app.worldle.model.AssetsFileLoader
 import com.nordeck.app.worldle.model.Country
 import com.nordeck.app.worldle.model.Direction
 import com.nordeck.app.worldle.model.Repository
+import com.nordeck.app.worldle.model.getDirectionTo
+import com.nordeck.app.worldle.model.getDistanceTo
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before

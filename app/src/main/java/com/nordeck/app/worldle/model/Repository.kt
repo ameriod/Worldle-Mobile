@@ -33,8 +33,11 @@ class Repository(
 
         @VisibleForTesting
         fun getCountriesInternal(fileLoader: FileLoader): List<Country> {
-            val assets = fileLoader.getAllFilesInPath("").map { it.replace("/vector.svg", "") }
-            val json = fileLoader.getStringFromFile("countries.json")
+            val assets = fileLoader.getAllFilesInPath("")
+                .map {
+                    // In tests this returns the files, on the device this just returns the directories?
+                    it.replace("/vector.svg", "")
+                }
             return Json.decodeFromStream<List<Country>>(
                 stream = fileLoader.getInputStreamFromFile("countries.json")
             ).filter { country ->

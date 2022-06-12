@@ -1,7 +1,9 @@
-package com.nordeck.app.worldle.model
+package com.nordeck.app.worldle.ui.main
 
 import com.nordeck.app.worldle.ConversionMath
 import com.nordeck.app.worldle.isMetric
+import com.nordeck.app.worldle.model.Country
+import com.nordeck.app.worldle.model.Direction
 import java.util.Locale
 
 data class Guess(

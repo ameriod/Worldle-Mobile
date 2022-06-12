@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Surface
@@ -36,19 +37,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nordeck.app.worldle.AppApplication
-import com.nordeck.app.worldle.model.Country
-import com.nordeck.app.worldle.model.Guess
+import com.nordeck.app.worldle.BuildConfig
 import com.nordeck.app.worldle.ui.theme.WorldleAndoirdTheme
 import kotlinx.coroutines.launch
 
@@ -154,15 +149,30 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             ),
                         onClick = {
                             // TODO share logic
-                            viewModel.resetGame()
                         }
                     ) {
                         Text(text = "Share")
+                    }
+                    if (BuildConfig.DEBUG) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 16.dp,
+                                    vertical = 8.dp
+                                ),
+                            onClick = {
+                                viewModel.resetGame()
+                            }
+                        ) {
+                            Text("Reset")
+                        }
                     }
                 }
             }
             else -> {
                 item {
+                    val highlightColor = MaterialTheme.colors.primary
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -182,7 +192,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             Text(text = "Country, territory...")
                         },
                         onValueChange = {
-                            viewModel.onGuessUpdated(it)
+                            viewModel.onGuessUpdated(it, highlightColor)
                         },
                         keyboardActions = KeyboardActions {
                             viewModel.onGuessDone()
@@ -208,10 +218,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             horizontal = 16.dp,
                             vertical = 8.dp
                         ),
-                    text = suggestion.highlightGuess(
-                        input = state.guessInput,
-                        highlightColor = MaterialTheme.colors.primary
-                    )
+                    text = suggestion.displayText
                 )
             }
         }
@@ -244,23 +251,3 @@ private fun GuessView(modifier: Modifier = Modifier, guess: Guess) {
         Text(text = "${guess.proximityPercent}%")
     }
 }
-
-private fun Country.highlightGuess(input: String, highlightColor: Color): AnnotatedString =
-    buildAnnotatedString {
-        // TODO this is not working
-        val parts = name.split(Regex("((?=${name})|(?<=${name}))")) // ktlint-disable
-        parts.forEach {
-            if (it.equals(input, true)) {
-                withStyle(
-                    style = SpanStyle(
-                        color = highlightColor,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append(it)
-                }
-            } else {
-                append(it)
-            }
-        }
-    }
