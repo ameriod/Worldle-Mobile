@@ -1,12 +1,14 @@
 package com.nordeck.app.worldle
 
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.roundToLong
+import kotlin.math.ln
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.math.tan
 
 /**
  * see https://github.com/jillesvangurp/geogeometry/blob/master/src/commonMain/kotlin/com/jillesvangurp/geo/GeoGeometry.kt
@@ -51,9 +53,6 @@ class GeoMath {
          * @return the distance in meters
          */
         fun distance(lat1: Double, long1: Double, lat2: Double, long2: Double): Double {
-            validate(lat1, long1, false)
-            validate(lat2, long2, false)
-
             val deltaLat = toRadians(lat2 - lat1)
             val deltaLon = toRadians(long2 - long1)
 
@@ -76,40 +75,25 @@ class GeoMath {
          *
          * @return The heading in degrees clockwise from north.
          */
-        fun headingFromTwoPoints(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        fun bearing(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
             val latitude1: Double = toRadians(lat1)
             val latitude2: Double = toRadians(lat2)
-            val longDiff: Double = toRadians(lon2 - lon1)
-            val y: Double = sin(longDiff) * cos(latitude2)
-            val x: Double =
-                cos(latitude1) * sin(latitude2) - sin(latitude1) * cos(
-                    latitude2
-                ) * cos(longDiff)
-            return (fromRadians(atan2(y, x)) + 360) % 360
-        }
+            var longDiff: Double = toRadians(lng2 - lng1)
 
-        /**
-         * Validates coordinates. Note. because of some edge cases at the extremes that I've encountered in several data sources, I've built in
-         * a small tolerance for small rounding errors that allows e.g. 180.00000000000023 to validate.
-         * @param latitude latitude between -90.0 and 90.0
-         * @param longitude longitude between -180.0 and 180.0
-         * @param strict if false, it will allow for small rounding errors. If true, it will not.
-         * @throws IllegalArgumentException if the lat or lon is out of the allowed range.
-         */
-        private fun validate(latitude: Double, longitude: Double, strict: Boolean = false) {
-            var roundedLat = latitude
-            var roundedLon = longitude
-            if (!strict) {
-                // this gets rid of rounding errors in raw data e.g. 180.00000000000023 will validate
-                roundedLat = (latitude * 1000000).roundToLong() / 1000000.0
-                roundedLon = (longitude * 1000000).roundToLong() / 1000000.0
+            // difference latitude coords phi
+            val diffPhi =
+                ln(tan(latitude2 / 2 + Math.PI / 4) / tan(latitude1 / 2 + Math.PI / 4))
+
+            // recalculate diffLon if it is greater than pi
+            if (abs(longDiff) > Math.PI) {
+                longDiff = if (longDiff > 0) {
+                    (Math.PI * 2 - longDiff) * -1
+                } else {
+                    Math.PI * 2 + longDiff
+                }
             }
-            if (roundedLat < -90.0 || roundedLat > 90.0) {
-                throw IllegalArgumentException("Latitude $latitude is outside legal range of -90,90")
-            }
-            if (roundedLon < -180.0 || roundedLon > 180.0) {
-                throw IllegalArgumentException("Longitude $longitude is outside legal range of -180,180")
-            }
+
+            return (fromRadians(atan2(longDiff, diffPhi)) + 360) % 360
         }
     }
 }

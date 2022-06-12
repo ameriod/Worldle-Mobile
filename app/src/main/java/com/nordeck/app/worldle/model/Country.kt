@@ -29,11 +29,11 @@ data class Country(
         return if (this == dest) {
             Direction.CORRECT
         } else {
-            val bearing = GeoMath.headingFromTwoPoints(
+            val bearing = GeoMath.bearing(
                 lat1 = latitude,
-                lon1 = longitude,
+                lng1 = longitude,
                 lat2 = dest.latitude,
-                lon2 = dest.longitude
+                lng2 = dest.longitude
             )
             Timber.d("Bearing: $bearing")
             // Make sure we only use real "Direction"
