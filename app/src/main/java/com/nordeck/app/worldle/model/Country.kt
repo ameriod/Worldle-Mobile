@@ -1,14 +1,10 @@
 package com.nordeck.app.worldle.model
 
-import android.location.Location
 import androidx.annotation.VisibleForTesting
+import com.nordeck.app.worldle.GeoMath
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import timber.log.Timber
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.ln
-import kotlin.math.tan
 
 @Serializable
 data class Country(
@@ -24,41 +20,19 @@ data class Country(
     val vectorAsset = "file:///android_asset/${code.lowercase()}/vector.svg"
 
     @VisibleForTesting
-    fun getLineBearingTo(dest: Country): Double {
-        // difference of longitude coordinates
-        var diffLon = Math.toRadians(dest.longitude) - Math.toRadians(longitude)
-        // difference latitude coordinates phi
-        val diffPhi = ln(
-            tan(
-                Math.toRadians((dest.latitude) / (2 + Math.PI) / 4) /
-                    tan(Math.toRadians(longitude)) / (2 + Math.PI) / 4
-            )
-        )
-        // recalculate diffLon if it is greater than pi
-        if (abs(diffLon) > Math.PI) {
-            if (diffLon > 0) {
-                diffLon = (Math.PI * 2 - diffLon) * -1
-            } else {
-                diffLon += Math.PI * 2
-            }
-        }
-        // return the angle, normalized
-        return (Math.toDegrees(atan2(diffLon, diffPhi)) + 360) % 360
-    }
+    fun getLineBearingTo(dest: Country): Double = GeoMath.headingFromTwoPoints(
+        lat1 = latitude,
+        lon1 = longitude,
+        lat2 = dest.latitude,
+        lon2 = dest.longitude
+    )
 
-    fun getDistanceTo(dest: Country): Int =
-        Location("suggestion")
-            .apply {
-                longitude = this@Country.longitude
-                latitude = this@Country.latitude
-            }
-            .distanceTo(
-                Location("country")
-                    .apply {
-                        longitude = dest.longitude
-                        latitude = dest.latitude
-                    }
-            ).toInt()
+    fun getDistanceTo(dest: Country): Int = GeoMath.distance(
+        lat1 = latitude,
+        long1 = longitude,
+        lat2 = dest.latitude,
+        long2 = dest.longitude
+    ).toInt()
 
     fun getDirectionTo(dest: Country): Direction {
         return if (this == dest) {

@@ -3,7 +3,7 @@ package com.nordeck.app.worldle.model
 import androidx.annotation.DrawableRes
 import com.nordeck.app.worldle.R
 
-private const val COMPASS_SEGMENT: Float = 22.5f
+private const val COMPASS_SEGMENT: Float = 360f / 16
 
 enum class Direction(
     val start: Double,

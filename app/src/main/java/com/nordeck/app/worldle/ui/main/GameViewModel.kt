@@ -35,7 +35,7 @@ class GameViewModel(
             updateState(
                 if (restoredGame == null) {
                     val seed = "$date+${countries.size}".hashCode()
-                    createNewGame(countries.random(Random(seed)))
+                    createNewGame(countries, countries.random(Random(seed)))
                 } else {
                     restoredGame
                 }
@@ -46,7 +46,7 @@ class GameViewModel(
     fun resetGame() {
         state.value?.allCountries?.run {
             val seed = "$date+${this.size}".hashCode()
-            updateState(createNewGame(this.random(Random(seed))))
+            updateState(createNewGame(this, this.random(Random(seed))))
         }
     }
 
@@ -74,11 +74,11 @@ class GameViewModel(
         }
     }
 
-    private fun createNewGame(countryToGuess: Country): State {
+    private fun createNewGame(allCountries: List<Country>, countryToGuess: Country): State {
         Timber.d("New game: $countryToGuess")
 
         return State(
-            allCountries = state.value?.allCountries ?: emptyList(),
+            allCountries = allCountries,
             guessInput = "",
             suggestions = emptyList(),
             countryToGuess = countryToGuess,
