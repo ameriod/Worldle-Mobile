@@ -44,7 +44,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nordeck.app.worldle.AppApplication
 import com.nordeck.app.worldle.BuildConfig
-import com.nordeck.app.worldle.ui.theme.WorldleAndoirdTheme
+import com.nordeck.app.worldle.ui.theme.WorldleAndroidTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            WorldleAndoirdTheme {
+            WorldleAndroidTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
