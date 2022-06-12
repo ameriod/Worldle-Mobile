@@ -9,7 +9,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
- * https://github.com/jillesvangurp/geogeometry/blob/master/src/commonMain/kotlin/com/jillesvangurp/geo/GeoGeometry.kt
+ * see https://github.com/jillesvangurp/geogeometry/blob/master/src/commonMain/kotlin/com/jillesvangurp/geo/GeoGeometry.kt
  */
 class GeoMath {
     companion object {
@@ -96,7 +96,7 @@ class GeoMath {
          * @param strict if false, it will allow for small rounding errors. If true, it will not.
          * @throws IllegalArgumentException if the lat or lon is out of the allowed range.
          */
-        fun validate(latitude: Double, longitude: Double, strict: Boolean = false) {
+        private fun validate(latitude: Double, longitude: Double, strict: Boolean = false) {
             var roundedLat = latitude
             var roundedLon = longitude
             if (!strict) {

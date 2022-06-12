@@ -1,6 +1,5 @@
 package com.nordeck.app.worldle.model
 
-import androidx.annotation.VisibleForTesting
 import com.nordeck.app.worldle.GeoMath
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
