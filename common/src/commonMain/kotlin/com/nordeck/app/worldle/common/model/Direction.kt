@@ -1,5 +1,4 @@
-package com.nordeck.app.worldle.common
-
+package com.nordeck.app.worldle.common.model
 
 private const val COMPASS_SEGMENT: Float = 360f / 16
 

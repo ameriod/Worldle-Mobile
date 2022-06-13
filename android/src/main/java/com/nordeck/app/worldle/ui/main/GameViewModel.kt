@@ -5,8 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nordeck.app.worldle.common.Country
+import com.nordeck.app.worldle.common.GeoMath
 import com.nordeck.app.worldle.common.db.History
+import com.nordeck.app.worldle.common.model.Country
+import com.nordeck.app.worldle.common.model.Guess
 import com.nordeck.app.worldle.model.Repository
 import com.nordeck.app.worldle.model.getByCode
 import com.nordeck.app.worldle.model.getDirectionTo
@@ -133,7 +135,7 @@ class GameViewModel(
         return Guess(
             country = this,
             distanceFromMeters = distanceFrom,
-            proximityPercent = computeProximityPercent(distanceFrom),
+            proximityPercent = GeoMath.computeProximityPercent(distanceFrom),
             direction = this.getDirectionTo(countryToGuess)
         )
     }
@@ -166,13 +168,6 @@ class GameViewModel(
     }
 
     companion object {
-
         private const val MAX_GUESSES = 5
-        private const val MAX_DISTANCE_ON_EARTH = 20000000
-
-        private fun computeProximityPercent(distance: Int): Int {
-            val proximity = (MAX_DISTANCE_ON_EARTH - distance).toDouble()
-            return ((proximity / MAX_DISTANCE_ON_EARTH) * 100).toInt()
-        }
     }
 }

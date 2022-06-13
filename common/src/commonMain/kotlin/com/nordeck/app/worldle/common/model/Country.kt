@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle.common
+package com.nordeck.app.worldle.common.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

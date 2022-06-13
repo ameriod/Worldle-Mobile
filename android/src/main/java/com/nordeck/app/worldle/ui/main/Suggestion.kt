@@ -7,7 +7,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import com.nordeck.app.worldle.common.Country
+import com.nordeck.app.worldle.common.model.Country
 
 data class Suggestion(
     val country: Country,

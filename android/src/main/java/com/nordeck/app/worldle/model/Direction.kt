@@ -2,7 +2,7 @@ package com.nordeck.app.worldle.model
 
 import androidx.annotation.DrawableRes
 import com.nordeck.app.worldle.R
-import com.nordeck.app.worldle.common.Direction
+import com.nordeck.app.worldle.common.model.Direction
 
 val Direction.drawableResId: Int
     @DrawableRes get() = when (this) {

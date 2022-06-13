@@ -1,9 +1,9 @@
 package com.nordeck.app.worldle.model
 
 import androidx.annotation.VisibleForTesting
-import com.nordeck.app.worldle.common.Country
 import com.nordeck.app.worldle.common.HistoryDatabase
 import com.nordeck.app.worldle.common.db.History
+import com.nordeck.app.worldle.common.model.Country
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream

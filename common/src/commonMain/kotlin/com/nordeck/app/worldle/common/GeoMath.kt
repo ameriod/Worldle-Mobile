@@ -21,6 +21,7 @@ class GeoMath {
         private const val EARTH_RADIUS_METERS = 6371000.0
         private const val DEGREES_TO_RADIANS = 2.0 * PI / 360.0
         private const val RADIANS_TO_DEGREES = 1.0 / DEGREES_TO_RADIANS
+        private const val MAX_DISTANCE_ON_EARTH = 20000000
 
         private fun toRadians(degrees: Double): Double {
             return degrees * DEGREES_TO_RADIANS
@@ -86,6 +87,11 @@ class GeoMath {
             }
 
             return (fromRadians(atan2(longDiff, diffPhi)) + 360) % 360
+        }
+
+        fun computeProximityPercent(distance: Int): Int {
+            val proximity = (MAX_DISTANCE_ON_EARTH - distance).toDouble()
+            return ((proximity / MAX_DISTANCE_ON_EARTH) * 100).toInt()
         }
     }
 }
