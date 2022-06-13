@@ -10,9 +10,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
-/**
- * see https://github.com/jillesvangurp/geogeometry/blob/master/src/commonMain/kotlin/com/jillesvangurp/geo/GeoGeometry.kt
- */
 class GeoMath {
     companion object {
 
@@ -34,6 +31,8 @@ class GeoMath {
         }
 
         /**
+         * From https://github.com/jillesvangurp/geogeometry/blob/master/src/commonMain/kotlin/com/jillesvangurp/geo/GeoGeometry.kt
+         *
          * Compute the Haversine distance between the two coordinates. Haversine is
          * one of several distance calculation algorithms that exist. It is not very
          * precise in the sense that it assumes the earth is a perfect sphere, which
@@ -44,17 +43,17 @@ class GeoMath {
          *
          * @param lat1
          * the latitude in decimal degrees
-         * @param long1
+         * @param lng1
          * the longitude in decimal degrees
          * @param lat2
          * the latitude in decimal degrees
-         * @param long2
+         * @param lng2
          * the longitude in decimal degrees
          * @return the distance in meters
          */
-        fun distance(lat1: Double, long1: Double, lat2: Double, long2: Double): Double {
+        fun distance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
             val deltaLat = toRadians(lat2 - lat1)
-            val deltaLon = toRadians(long2 - long1)
+            val deltaLon = toRadians(lng1 - lng2)
 
             val a =
                 sin(deltaLat / 2) * sin(deltaLat / 2) + cos(toRadians(lat1)) * cos(toRadians(lat2)) * sin(
@@ -68,13 +67,6 @@ class GeoMath {
             return EARTH_RADIUS_METERS * c
         }
 
-        /**
-         * Returns the heading from one LatLng to another LatLng as a compass direction.
-         *
-         * @see https://stackoverflow.com/questions/9457988/bearing-from-one-coordinate-to-another
-         *
-         * @return The heading in degrees clockwise from north.
-         */
         fun bearing(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
             val latitude1: Double = toRadians(lat1)
             val latitude2: Double = toRadians(lat2)

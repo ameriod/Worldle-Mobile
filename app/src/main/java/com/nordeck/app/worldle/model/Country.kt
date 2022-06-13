@@ -21,9 +21,9 @@ data class Country(
 
 fun Country.getDistanceTo(dest: Country): Int = GeoMath.distance(
     lat1 = latitude,
-    long1 = longitude,
+    lng1 = longitude,
     lat2 = dest.latitude,
-    long2 = dest.longitude
+    lng2 = dest.longitude
 ).toInt()
 
 fun Country.getDirectionTo(dest: Country): Direction {
