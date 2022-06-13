@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nordeck.app.worldle.common.Country
 import com.nordeck.app.worldle.common.db.History
-import com.nordeck.app.worldle.model.Country
 import com.nordeck.app.worldle.model.Repository
 import com.nordeck.app.worldle.model.getByCode
 import com.nordeck.app.worldle.model.getDirectionTo

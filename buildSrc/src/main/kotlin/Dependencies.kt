@@ -13,7 +13,7 @@ object Versions {
     const val compileSdk = 31
     const val targetSdk = 31
 
-    const val kotlinxSerializationCore = "1.2.2"
+    const val kotlinxSerializationCore = "1.3.3"
     const val kotlinxCoroutinesCore = "1.6.1-native-mt"
 }
 

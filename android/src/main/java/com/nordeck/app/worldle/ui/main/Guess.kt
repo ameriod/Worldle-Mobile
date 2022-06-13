@@ -1,9 +1,8 @@
 package com.nordeck.app.worldle.ui.main
 
 import com.nordeck.app.worldle.common.ConversionMath
-import com.nordeck.app.worldle.common.isMetric
-import com.nordeck.app.worldle.model.Country
-import com.nordeck.app.worldle.model.Direction
+import com.nordeck.app.worldle.common.Country
+import com.nordeck.app.worldle.common.Direction
 import java.util.Locale
 
 data class Guess(
@@ -19,5 +18,13 @@ data class Guess(
         } else {
             "${(ConversionMath.metersToMiles(distanceFromMeters))} mi"
         }
+    }
+}
+
+private fun Locale.isMetric(): Boolean {
+    return when (country.uppercase(this)) {
+        // Only the best countries right here.
+        "US", "LR", "MM" -> false
+        else -> true
     }
 }

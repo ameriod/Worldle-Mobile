@@ -1,6 +1,7 @@
 package com.nordeck.app.worldle.model
 
 import androidx.annotation.VisibleForTesting
+import com.nordeck.app.worldle.common.Country
 import com.nordeck.app.worldle.common.HistoryDatabase
 import com.nordeck.app.worldle.common.db.History
 import kotlinx.coroutines.coroutineScope

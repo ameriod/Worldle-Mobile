@@ -27,6 +27,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerializationCore}")
             }
         }
         val commonTest by getting {

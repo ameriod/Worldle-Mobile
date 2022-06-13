@@ -1,21 +1,9 @@
 package com.nordeck.app.worldle.model
 
+import com.nordeck.app.worldle.common.Country
+import com.nordeck.app.worldle.common.Direction
 import com.nordeck.app.worldle.common.GeoMath
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import timber.log.Timber
-
-@Serializable
-data class Country(
-    @SerialName("code")
-    val code: String,
-    @SerialName("latitude")
-    val latitude: Double,
-    @SerialName("longitude")
-    val longitude: Double,
-    @SerialName("name")
-    val name: String
-)
 
 val Country.vectorAsset: String get() = "file:///android_asset/${code.lowercase()}/vector.svg"
 
