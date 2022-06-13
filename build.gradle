@@ -3,7 +3,7 @@ buildscript {
         compose_version = '1.2.0-beta02'
         coil_version = '2.1.0'
         kotlin_version = '1.6.21'
-        sqldelight_version = '1.5.3'
+        sqldelight_version = Versions.sqlDelight
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
