@@ -1,9 +1,9 @@
 package com.nordeck.app.worldle
 
 import com.nordeck.app.worldle.common.ConversionMath
+import com.nordeck.app.worldle.common.Country
+import com.nordeck.app.worldle.common.Direction
 import com.nordeck.app.worldle.model.AssetsFileLoader
-import com.nordeck.app.worldle.model.Country
-import com.nordeck.app.worldle.model.Direction
 import com.nordeck.app.worldle.model.Repository
 import com.nordeck.app.worldle.model.getDirectionTo
 import com.nordeck.app.worldle.model.getDistanceTo
