@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle.model
+package com.nordeck.app.worldle.ui.main
 
 import androidx.annotation.DrawableRes
 import com.nordeck.app.worldle.R

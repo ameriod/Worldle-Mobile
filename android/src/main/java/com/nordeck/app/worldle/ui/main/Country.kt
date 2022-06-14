@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle.model
+package com.nordeck.app.worldle.ui.main
 
 import com.nordeck.app.worldle.common.GeoMath
 import com.nordeck.app.worldle.common.model.Country

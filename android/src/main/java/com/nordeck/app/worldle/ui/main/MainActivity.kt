@@ -44,8 +44,6 @@ import coil.request.ImageRequest
 import com.nordeck.app.worldle.AppApplication
 import com.nordeck.app.worldle.BuildConfig
 import com.nordeck.app.worldle.common.model.Guess
-import com.nordeck.app.worldle.model.drawableResId
-import com.nordeck.app.worldle.model.vectorAsset
 import com.nordeck.app.worldle.ui.theme.WorldleAndroidTheme
 import kotlinx.coroutines.launch
 

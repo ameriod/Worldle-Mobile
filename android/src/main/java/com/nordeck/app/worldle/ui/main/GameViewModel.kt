@@ -9,10 +9,7 @@ import com.nordeck.app.worldle.common.GeoMath
 import com.nordeck.app.worldle.common.db.History
 import com.nordeck.app.worldle.common.model.Country
 import com.nordeck.app.worldle.common.model.Guess
-import com.nordeck.app.worldle.model.Repository
-import com.nordeck.app.worldle.model.getByCode
-import com.nordeck.app.worldle.model.getDirectionTo
-import com.nordeck.app.worldle.model.getDistanceTo
+import com.nordeck.app.worldle.common.model.Repository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.ZoneId
