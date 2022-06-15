@@ -9,7 +9,7 @@ import com.nordeck.app.worldle.common.HistoryDatabase
 import com.nordeck.app.worldle.common.db.History
 import com.nordeck.app.worldle.common.model.FileLoader
 import com.nordeck.app.worldle.common.model.Repository
-import com.nordeck.app.worldle.model.listOfStringsAdapter
+import com.nordeck.app.worldle.common.model.listOfStringsAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
 import timber.log.Timber

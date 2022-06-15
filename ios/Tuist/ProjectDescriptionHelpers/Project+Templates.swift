@@ -47,7 +47,7 @@ extension Project {
             sources: ["Targets/\(name)/Sources/**"],
             resources: [
                 "Targets/\(name)/Resources/**",
-                "../common/src/androidMain/assets/*"
+                "../common/src/androidMain/assets/**"
             ],
             scripts: appScript,
             dependencies: dependencies

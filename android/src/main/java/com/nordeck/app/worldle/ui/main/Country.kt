@@ -5,7 +5,7 @@ import com.nordeck.app.worldle.common.model.Country
 import com.nordeck.app.worldle.common.model.Direction
 import timber.log.Timber
 
-val Country.vectorAsset: String get() = "file:///android_asset/${code.lowercase()}/vector.svg"
+val Country.vectorAsset: String get() = "file:///android_asset/${code.lowercase()}.svg"
 
 fun Country.getDistanceTo(dest: Country): Int = GeoMath.distance(
     lat1 = latitude,
