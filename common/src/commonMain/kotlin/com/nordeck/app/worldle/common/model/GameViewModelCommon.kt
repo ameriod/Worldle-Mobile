@@ -1,32 +1,23 @@
-package com.nordeck.app.worldle.ui.main
+package com.nordeck.app.worldle.common.model
 
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.nordeck.app.worldle.common.GeoMath
 import com.nordeck.app.worldle.common.db.History
-import com.nordeck.app.worldle.common.model.Country
-import com.nordeck.app.worldle.common.model.Guess
-import com.nordeck.app.worldle.common.model.Repository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-class GameViewModel(
-    private val repository: Repository
-) : ViewModel() {
+class GameViewModelCommon(
+    private val repository: Repository,
+    private val scope: CoroutineScope,
+    private val date: String
+) : GameViewModel {
 
-    private val stateLiveData = MutableLiveData<State>()
-    val state: LiveData<State> = stateLiveData
-    private val date: String by lazy(LazyThreadSafetyMode.NONE) {
-        ZonedDateTime.now(ZoneId.of("US/Eastern"))
-            .format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))
-    }
+    private val stateMutableFlow = MutableSharedFlow<GameViewModel.State?>(1)
+    override val state: Flow<GameViewModel.State?> = stateMutableFlow.asSharedFlow()
+    private var currentState: GameViewModel.State? = null
 
     private fun getRandom(countries: List<Country>): Random {
         val seed = "$date+${countries.size}".hashCode()
@@ -34,7 +25,7 @@ class GameViewModel(
     }
 
     init {
-        viewModelScope.launch {
+        scope.launch {
             val countries = repository.getCountries()
             val state = repository.getSavedGame(date)
                 ?.let {
@@ -44,14 +35,14 @@ class GameViewModel(
         }
     }
 
-    fun resetGame() {
-        state.value?.allCountries?.run {
+    override fun resetGame() {
+        currentState?.allCountries?.run {
             val seed = "$date+${this.size}".hashCode()
             updateState(createNewGame(this, this.random(Random(seed))))
         }
     }
 
-    private fun restoreGame(countries: List<Country>, history: History): State? {
+    private fun restoreGame(countries: List<Country>, history: History): GameViewModel.State? {
         val countryToGuess = countries.getByCode(history.country)
         return countryToGuess?.let {
             val guesses = history.guesses.mapNotNull { guess ->
@@ -60,7 +51,7 @@ class GameViewModel(
             }.map { suggestion ->
                 suggestion.toGuess(countryToGuess = countryToGuess)
             }
-            State(
+            GameViewModel.State(
                 allCountries = countries,
                 guessInput = "",
                 suggestions = emptyList(),
@@ -70,10 +61,11 @@ class GameViewModel(
         }
     }
 
-    private fun createNewGame(allCountries: List<Country>, countryToGuess: Country): State {
-        Timber.d("New game: $countryToGuess")
-
-        return State(
+    private fun createNewGame(
+        allCountries: List<Country>,
+        countryToGuess: Country
+    ): GameViewModel.State {
+        return GameViewModel.State(
             allCountries = allCountries,
             guessInput = "",
             suggestions = emptyList(),
@@ -82,8 +74,8 @@ class GameViewModel(
         )
     }
 
-    fun onGuessUpdated(input: String, highlightColor: Color) {
-        stateLiveData.value?.let { currentState ->
+    override fun onGuessUpdated(input: String) {
+        currentState?.let { currentState ->
             val newState = currentState.copy(
                 guessInput = input,
                 suggestions = if (input.isEmpty()) {
@@ -93,12 +85,6 @@ class GameViewModel(
                         country.name.contains(input, true) &&
                             // Do not show an already selected country.
                             !currentState.guesses.any { it.country == country }
-                    }.map {
-                        Suggestion(
-                            country = it,
-                            input = input,
-                            highlightColor = highlightColor
-                        )
                     }
                 }
             )
@@ -106,20 +92,19 @@ class GameViewModel(
         }
     }
 
-    fun onGuessDone() {
-        stateLiveData.value?.suggestions?.firstOrNull()?.let {
+    override fun onGuessDone() {
+        currentState?.suggestions?.firstOrNull()?.let {
             onSuggestionSelected(it)
         }
     }
 
-    fun onSuggestionSelected(suggestion: Suggestion) {
-        stateLiveData.value?.let { currentState ->
+    override fun onSuggestionSelected(suggestion: Country) {
+        currentState?.let { currentState ->
             val newState = currentState.copy(
                 guessInput = "",
                 suggestions = emptyList(),
                 guesses = currentState.guesses.toMutableList().apply {
-                    val newGuess =
-                        suggestion.country.toGuess(countryToGuess = currentState.countryToGuess)
+                    val newGuess = suggestion.toGuess(countryToGuess = currentState.countryToGuess)
                     add(newGuess)
                 }
             )
@@ -137,34 +122,11 @@ class GameViewModel(
         )
     }
 
-    private fun updateState(newState: State) {
-        viewModelScope.launch {
+    private fun updateState(newState: GameViewModel.State) {
+        scope.launch {
             repository.saveOrUpdate(newState.toHistory(date))
+            currentState = newState
+            stateMutableFlow.tryEmit(newState)
         }
-        stateLiveData.value = newState
-    }
-
-    data class State(
-        val allCountries: List<Country>,
-        val guessInput: String,
-        val suggestions: List<Suggestion>,
-        val countryToGuess: Country,
-        val guesses: List<Guess>
-    ) {
-
-        val hasLostGame: Boolean = guesses.size >= MAX_GUESSES
-
-        val hasWonGame: Boolean = guesses.any { it.country == countryToGuess }
-
-        fun toHistory(date: String): History =
-            History(
-                date = date,
-                country = countryToGuess.code,
-                guesses = guesses.map { it.country.code }
-            )
-    }
-
-    companion object {
-        private const val MAX_GUESSES = 5
     }
 }

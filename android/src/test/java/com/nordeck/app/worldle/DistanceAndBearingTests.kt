@@ -1,12 +1,10 @@
 package com.nordeck.app.worldle
 
+import com.nordeck.app.worldle.common.AssetsFileLoader
 import com.nordeck.app.worldle.common.ConversionMath
 import com.nordeck.app.worldle.common.model.Country
 import com.nordeck.app.worldle.common.model.Direction
-import com.nordeck.app.worldle.model.AssetsFileLoader
-import com.nordeck.app.worldle.model.Repository
-import com.nordeck.app.worldle.model.getDirectionTo
-import com.nordeck.app.worldle.model.getDistanceTo
+import com.nordeck.app.worldle.common.model.Repository
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before

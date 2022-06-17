@@ -25,7 +25,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nordeck.app.worldle.AppApplication
 import com.nordeck.app.worldle.BuildConfig
+import com.nordeck.app.worldle.common.model.GameViewModel
 import com.nordeck.app.worldle.common.model.Guess
 import com.nordeck.app.worldle.ui.theme.WorldleAndroidTheme
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel = GameViewModel(
+        val viewModel: GameViewModel = GameViewModelAndroid(
             repository = (applicationContext as AppApplication).repository
         )
 
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    when (val state = viewModel.state.observeAsState().value) {
+                    when (val state = viewModel.state.collectAsState(null).value) {
                         null -> GameLoadingView()
                         else -> GameView(state, viewModel)
                     }
@@ -172,7 +173,6 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
             }
             else -> {
                 item {
-                    val highlightColor = MaterialTheme.colors.primary
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -192,7 +192,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             Text(text = "Country, territory...")
                         },
                         onValueChange = {
-                            viewModel.onGuessUpdated(it, highlightColor)
+                            viewModel.onGuessUpdated(it)
                         },
                         keyboardActions = KeyboardActions {
                             viewModel.onGuessDone()
@@ -218,7 +218,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             horizontal = 16.dp,
                             vertical = 8.dp
                         ),
-                    text = suggestion.displayText
+                    text = suggestion.highlightGuess(state.guessInput, MaterialTheme.colors.primary)
                 )
             }
         }

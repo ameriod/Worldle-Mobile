@@ -28,7 +28,7 @@ kotlin {
             dependencies {
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerializationCore}")
-                implementation(Libraries.Common.kotlinxCoroutinesCore)
+                api(Libraries.Common.kotlinxCoroutinesCore)
             }
         }
         val commonTest by getting {
@@ -40,7 +40,7 @@ kotlin {
             dependencies {
                 api("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
                 api("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
-                implementation(Libraries.Android.coroutinesAndroid)
+                api(Libraries.Android.coroutinesAndroid)
             }
         }
         val androidTest by getting
