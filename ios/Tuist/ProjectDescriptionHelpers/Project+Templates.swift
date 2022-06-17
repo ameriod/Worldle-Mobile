@@ -14,7 +14,9 @@ extension Project {
         let targets = makeAppTargets(
             name: name,
             platform: platform,
-            dependencies: []
+            dependencies: [
+                .xcframework(path: "../common/build/XCFrameworks/debug/common.xcframework")
+            ]
         )
         return Project(
             name: name,
@@ -44,7 +46,9 @@ extension Project {
             product: .app,
             bundleId: "com.nordeck.\(name)",
             infoPlist: .extendingDefault(with: infoPlist),
-            sources: ["Targets/\(name)/Sources/**"],
+            sources: [
+                "Targets/\(name)/Sources/**"
+            ],
             resources: [
                 "Targets/\(name)/Resources/**",
                 "../common/src/androidMain/assets/**"
@@ -59,7 +63,9 @@ extension Project {
             product: .unitTests,
             bundleId: "com.nordeck.\(name)Tests",
             infoPlist: .default,
-            sources: ["Targets/\(name)/Tests/**"],
+            sources: [
+                "Targets/\(name)/Tests/**"
+            ],
             dependencies: [
                 .target(name: "\(name)")
             ]

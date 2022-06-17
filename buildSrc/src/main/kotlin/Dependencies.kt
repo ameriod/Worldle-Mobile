@@ -14,7 +14,6 @@ object Versions {
     const val targetSdk = 31
 
     const val kotlinxSerializationCore = "1.3.3"
-    const val kotlinxCoroutinesCore = "${coroutines}-native-mt"
 }
 
 object Libraries {
@@ -31,7 +30,7 @@ object Libraries {
         const val kotlinxSerializationCore =
             "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.kotlinxSerializationCore}"
         const val kotlinxCoroutinesCore =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinxCoroutinesCore}"
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
     }
 
     object Android {

@@ -53,7 +53,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-                implementation("com.squareup.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation(Libraries.iOS.sqlDelight)
             }
         }
         val iosX64Test by getting
