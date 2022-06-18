@@ -1,4 +1,5 @@
 import common
+import SVGView
 import SwiftUI
 
 @main
@@ -23,10 +24,9 @@ struct GameView: View {
     }
 
     var body: some View {
-        if viewModel.state != nil {
+        if let state = viewModel.state {
             VStack {
-                Text(viewModel.state?.countryToGuess.name ?? "Loaded")
-                // SVGView(fileURL: Bundle.main.url(forResource: "example", withExtension: "svg")!)
+                SVGView(contentsOf: state.countryToGuess.svgPath)
             }
         } else {
             Text("Loading...")
@@ -78,4 +78,11 @@ class ViewModel: ObservableObject {
         commonVM.resetGame()
     }
 
+}
+
+extension Country {
+
+    var svgPath: URL {
+        Bundle.main.resourceURL!.appendingPathComponent(code.lowercased()).appendingPathExtension("svg")
+    }
 }
