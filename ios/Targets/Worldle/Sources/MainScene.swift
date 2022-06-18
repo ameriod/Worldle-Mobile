@@ -23,8 +23,14 @@ struct GameView: View {
     }
 
     var body: some View {
-        Spacer()
-            .background(Color.red)
+        if viewModel.state != nil {
+            VStack {
+                Text(viewModel.state?.countryToGuess.name ?? "Loaded")
+                // SVGView(fileURL: Bundle.main.url(forResource: "example", withExtension: "svg")!)
+            }
+        } else {
+            Text("Loading...")
+        }
     }
 }
 
@@ -43,15 +49,15 @@ class ViewModel: ObservableObject {
 
     private let commonVM: GameViewModelCommon
     private let scopeProvider: ScopeProvider = SharedGlobalScopeProvider()
+    @Published var state: GameViewModelState?
 
     init(repository: Repository) {
         commonVM = GameViewModelCommon(repository: repository, scope: scopeProvider.scope, date: "1/11/1911")
         createOptionalPublisher(flowWrapper: PlatformKt.getState(commonVM, scope: scopeProvider))
             .sink(receiveCompletion: {
                 print("Error \($0)")
-
-            }, receiveValue: {
-                print("Value \($0)")
+            }, receiveValue: { [unowned self] state in
+                self.state = state
             })
             .withLifetime(of: self)
     }
