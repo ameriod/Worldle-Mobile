@@ -1,4 +1,8 @@
+import ForestKit
 import UIKit
+
+public typealias ForestKitLogging = ForestKit
+public let Forest = ForestKitLogging.instance
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -8,6 +12,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        #if DEBUG
+        Forest.plant(
+            ForestKit.PrintTree()
+        )
+        #endif
         return true
     }
 
