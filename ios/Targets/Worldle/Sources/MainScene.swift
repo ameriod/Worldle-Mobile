@@ -55,7 +55,7 @@ class ViewModel: ObservableObject {
         commonVM = GameViewModelCommon(repository: repository, scope: scopeProvider.scope, date: "1/11/1911")
         createOptionalPublisher(flowWrapper: PlatformKt.getState(commonVM, scope: scopeProvider))
             .sink(receiveCompletion: {
-                print("Error \($0)")
+                Forest.e("Error with state flow: \($0)")
             }, receiveValue: { [unowned self] state in
                 self.state = state
             })

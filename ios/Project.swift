@@ -25,6 +25,7 @@ let project = Project(
     packages: [
         .remote(url: "https://github.com/exyte/SVGView", requirement: .exact("1.0.4")),
         .remote(url: "https://github.com/ameriod/ForestKit", requirement: .exact("0.1.0")),
+        .remote(url: "https://github.com/hmlongco/Resolver", requirement: .exact("1.5.0")),
     ],
     targets: [
         Target(name: name,
@@ -47,6 +48,7 @@ let project = Project(
                    .xcframework(path: "../common/build/XCFrameworks/debug/common.xcframework"),
                    .package(product: "SVGView"),
                    .package(product: "ForestKit"),
+                   .package(product: "Resolver"),
                ])
     ],
     additionalFiles: [
