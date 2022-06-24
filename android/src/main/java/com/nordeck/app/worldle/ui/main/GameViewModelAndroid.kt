@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class GameViewModelAndroid(
-    private val repository: Repository,
+    repository: Repository,
 ) : ViewModel(), GameViewModel {
 
     private val common = GameViewModelCommon(
