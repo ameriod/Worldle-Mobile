@@ -4,4 +4,4 @@ cd ../
 ./gradlew assembleCommonDebugXCFramework
 cd ios
 
-tuist generate
+tuist generate --open

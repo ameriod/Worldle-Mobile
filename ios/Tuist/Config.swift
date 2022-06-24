@@ -1,5 +1,8 @@
 import ProjectDescription
 
 let config = Config(
-    generationOptions: []
+    generationOptions: [
+        .disableSynthesizedResourceAccessors,
+        .disableBundleAccessors,
+    ]
 )

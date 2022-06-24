@@ -25,9 +25,12 @@ struct GameView: View {
 
     var body: some View {
         if let state = viewModel.state {
-            VStack {
+            LazyVStack {
                 SVGView(contentsOf: state.countryToGuess.svgPath)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 300, alignment: .center)
             }
+            VStack { }
         } else {
             Text("Loading...")
         }

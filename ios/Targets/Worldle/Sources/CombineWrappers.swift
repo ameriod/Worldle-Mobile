@@ -4,13 +4,13 @@ import Combine
 import common
 
 func createPublisher<T>(flowWrapper: FlowWrapper<T>) -> AnyPublisher<T, KotlinError> {
-    return Deferred<Publishers.HandleEvents<PassthroughSubject<T, KotlinError>>> {
+    Deferred<Publishers.HandleEvents<PassthroughSubject<T, KotlinError>>> {
         let subject = PassthroughSubject<T, KotlinError>()
-        let job = flowWrapper.subscribe { (item) in
-            let _ = subject.send(item)
+        let job = flowWrapper.subscribe { item in
+            _ = subject.send(item)
         } onComplete: {
             subject.send(completion: .finished)
-        } onThrow: { (error) in
+        } onThrow: { error in
             subject.send(completion: .failure(KotlinError(error)))
         }
         return subject.handleEvents(receiveCancel: {
@@ -20,13 +20,13 @@ func createPublisher<T>(flowWrapper: FlowWrapper<T>) -> AnyPublisher<T, KotlinEr
 }
 
 func createOptionalPublisher<T>(flowWrapper: NullableFlowWrapper<T>) -> AnyPublisher<T?, KotlinError> {
-    return Deferred<Publishers.HandleEvents<PassthroughSubject<T?, KotlinError>>> {
+    Deferred<Publishers.HandleEvents<PassthroughSubject<T?, KotlinError>>> {
         let subject = PassthroughSubject<T?, KotlinError>()
-        let job = flowWrapper.subscribe { (item) in
-            let _ = subject.send(item)
+        let job = flowWrapper.subscribe { item in
+            _ = subject.send(item)
         } onComplete: {
             subject.send(completion: .finished)
-        } onThrow: { (error) in
+        } onThrow: { error in
             subject.send(completion: .failure(KotlinError(error)))
         }
         return subject.handleEvents(receiveCancel: {
@@ -36,8 +36,8 @@ func createOptionalPublisher<T>(flowWrapper: NullableFlowWrapper<T>) -> AnyPubli
 }
 
 func createFuture<T>(suspendWrapper: SuspendWrapper<T>) -> AnyPublisher<T, KotlinError> {
-    return Deferred<Publishers.HandleEvents<Future<T, KotlinError>>> {
-        var job: Kotlinx_coroutines_coreJob? = nil
+    Deferred<Publishers.HandleEvents<Future<T, KotlinError>>> {
+        var job: Kotlinx_coroutines_coreJob?
         return Future { promise in
             job = suspendWrapper.subscribe(
                 onSuccess: { item in promise(.success(item)) },
@@ -51,8 +51,8 @@ func createFuture<T>(suspendWrapper: SuspendWrapper<T>) -> AnyPublisher<T, Kotli
 }
 
 func createOptionalFuture<T>(suspendWrapper: NullableSuspendWrapper<T>) -> AnyPublisher<T?, KotlinError> {
-    return Deferred<Publishers.HandleEvents<Future<T?, KotlinError>>> {
-        var job: Kotlinx_coroutines_coreJob? = nil
+    Deferred<Publishers.HandleEvents<Future<T?, KotlinError>>> {
+        var job: Kotlinx_coroutines_coreJob?
         return Future { promise in
             job = suspendWrapper.subscribe(
                 onSuccess: { item in promise(.success(item)) },
@@ -70,7 +70,6 @@ class KotlinError: LocalizedError {
     init(_ throwable: KotlinThrowable) {
         self.throwable = throwable
     }
-    var errorDescription: String? {
-        get { throwable.message }
-    }
+
+    var errorDescription: String? { throwable.message }
 }

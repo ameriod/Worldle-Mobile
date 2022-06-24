@@ -1,15 +1,6 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-/// Creates our project using a helper function defined in ProjectDescriptionHelpers
-// let project = Project.app(
-//    name: "Worldle",
-//    platform: .iOS,
-//    additionalFiles: [
-//        "../README.md",
-//    ]
-// )
-
 let infoPlist: [String: InfoPlist.Value] = [
     "CFBundleShortVersionString": "1.0",
     "CFBundleVersion": "1",
@@ -60,30 +51,29 @@ extension TargetScript {
 
     static var swfitlint: TargetScript {
         .pre(
-            script: "swiftLint",
-            name:
+            script:
             """
             if which swiftlint >/dev/null; then
               swiftlint
             else
               echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
             fi
-            """
+            """,
+            name: "swiftlint"
         )
     }
 
     static var swiftformat: TargetScript {
         .pre(
-            script: "swiftformat",
-            name:
+            script:
             """
             if which swiftformat >/dev/null; then
             swiftformat .
             else
             echo "warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat"
             fi
-            """
+            """,
+            name: "swiftformat"
         )
     }
-
 }
