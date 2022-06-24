@@ -94,11 +94,43 @@ struct SuggestionView: View {
 
     var body: some View {
         // TODO highlight
-        Text(suggestion.name)
-            // HighlightedText(text: suggestion.name, matching: input, hightlightColor: .blue)
+        HighlightText(text: suggestion.name, match: input, hightlightColor: .blue)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .onTapGesture(perform: action)
+    }
+}
+
+struct HighlightText: View {
+
+    var text: String
+    var match: String
+    var hightlightColor: Color
+
+    var body: some View {
+        StyledText(verbatim: text)
+            .style(.foregroundColor(hightlightColor), ranges: {
+                [
+                    $0.range(of: match),
+                    $0.range(of: match.lowercased()),
+                ]
+            })
+            .style(.bold(), ranges: {
+                [
+                    $0.range(of: match),
+                    $0.range(of: match.lowercased()),
+                ]
+            })
+    }
+}
+
+extension String {
+    func split(usingRegex pattern: String) -> [String] {
+        // ### Crashes when you pass invalid `pattern`
+        let regex = try! NSRegularExpression(pattern: pattern)
+        let matches = regex.matches(in: self, range: NSRange(0..<utf16.count))
+        let ranges = [startIndex..<startIndex] + matches.map { Range($0.range, in: self)! } + [endIndex..<endIndex]
+        return (0...matches.count).map { String(self[ranges[$0].upperBound..<ranges[$0 + 1].lowerBound]) }
     }
 }
 

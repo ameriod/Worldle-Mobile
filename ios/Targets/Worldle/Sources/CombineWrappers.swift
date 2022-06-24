@@ -7,7 +7,7 @@ func createPublisher<T>(flowWrapper: FlowWrapper<T>) -> AnyPublisher<T, KotlinEr
     Deferred<Publishers.HandleEvents<PassthroughSubject<T, KotlinError>>> {
         let subject = PassthroughSubject<T, KotlinError>()
         let job = flowWrapper.subscribe { item in
-            _ = subject.send(item)
+            subject.send(item)
         } onComplete: {
             subject.send(completion: .finished)
         } onThrow: { error in
@@ -23,7 +23,7 @@ func createOptionalPublisher<T>(flowWrapper: NullableFlowWrapper<T>) -> AnyPubli
     Deferred<Publishers.HandleEvents<PassthroughSubject<T?, KotlinError>>> {
         let subject = PassthroughSubject<T?, KotlinError>()
         let job = flowWrapper.subscribe { item in
-            _ = subject.send(item)
+            subject.send(item)
         } onComplete: {
             subject.send(completion: .finished)
         } onThrow: { error in
