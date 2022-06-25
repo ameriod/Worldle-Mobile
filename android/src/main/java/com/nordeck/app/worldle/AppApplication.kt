@@ -8,6 +8,7 @@ import com.nordeck.app.worldle.common.commonModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 import timber.log.Timber
 
 class AppApplication : Application() {
@@ -17,8 +18,8 @@ class AppApplication : Application() {
 
         Timber.plant(Timber.DebugTree())
 
-        startKoin(){
-            androidLogger()
+        startKoin {
+            androidLogger(if (BuildConfig.DEBUG) Level.INFO else Level.ERROR)
             androidContext(this@AppApplication)
             modules(commonModule)
         }

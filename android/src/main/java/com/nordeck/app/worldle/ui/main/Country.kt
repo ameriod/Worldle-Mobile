@@ -6,10 +6,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import com.nordeck.app.worldle.common.GeoMath
 import com.nordeck.app.worldle.common.model.Country
-import com.nordeck.app.worldle.common.model.Direction
-import timber.log.Timber
 
 val Country.vectorAsset: String get() = "file:///android_asset/${code.lowercase()}.svg"
 

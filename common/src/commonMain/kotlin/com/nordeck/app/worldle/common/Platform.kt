@@ -6,4 +6,4 @@ expect class Platform() {
 
 expect fun isLocaleMetric(): Boolean
 
-expect fun getDate() : String
+expect fun getDate(): String
