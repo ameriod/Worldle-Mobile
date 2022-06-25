@@ -31,6 +31,7 @@ kotlin {
                 api(Libraries.Common.kotlinxCoroutinesCore)
                 implementation(Libraries.Common.sqlDelight)
                 api(Libraries.Common.sqlDelightCoroutinesExtension)
+                api(Libraries.Common.koin)
             }
         }
         val commonTest by getting {
@@ -42,6 +43,8 @@ kotlin {
             dependencies {
                 api(Libraries.Android.sqlDelight)
                 api(Libraries.Android.coroutines)
+                api(Libraries.Common.koin)
+                api(Libraries.Android.koin)
             }
         }
         val androidTest by getting

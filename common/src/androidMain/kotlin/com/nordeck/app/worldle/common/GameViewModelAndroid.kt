@@ -1,4 +1,4 @@
-package com.nordeck.app.worldle.ui.main
+package com.nordeck.app.worldle.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,9 +17,7 @@ class GameViewModelAndroid(
 
     private val common = GameViewModelCommon(
         repository = repository,
-        scope = viewModelScope,
-        date = ZonedDateTime.now(ZoneId.of("US/Eastern"))
-            .format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))
+        scope = viewModelScope
     )
 
     override val state: Flow<GameViewModel.State?> = common.state

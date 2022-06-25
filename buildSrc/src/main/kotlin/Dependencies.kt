@@ -9,7 +9,7 @@ object Versions {
 
     const val coroutines = "1.6.2"
     const val coroutinesNative = "1.6.0-native-mt"
-    const val koin = "3.1.2"
+    const val koin = "3.2.0"
     const val minSdk = 26
     const val compileSdk = 31
     const val targetSdk = 31
@@ -22,8 +22,6 @@ object Libraries {
     const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
     const val sqlDelight = "com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}"
 
-    const val koinCore = "io.insert-koin:koin-core:${Versions.koin}"
-
     object Common {
         const val sqlDelight = "com.squareup.sqldelight:runtime:${Versions.sqlDelight}"
         const val sqlDelightCoroutinesExtension =
@@ -34,6 +32,7 @@ object Libraries {
             "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerializationCore}"
         const val kotlinxCoroutinesCore =
             "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+        const val koin = "io.insert-koin:koin-core:${Versions.koin}"
     }
 
     object Android {
@@ -45,6 +44,7 @@ object Libraries {
 
     object iOS {
         const val sqlDelight = "com.squareup.sqldelight:native-driver:${Versions.sqlDelight}"
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesNative}"
+        const val coroutines =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesNative}"
     }
 }

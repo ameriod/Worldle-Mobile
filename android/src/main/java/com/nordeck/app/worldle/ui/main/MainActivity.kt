@@ -41,20 +41,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.nordeck.app.worldle.AppApplication
 import com.nordeck.app.worldle.BuildConfig
+import com.nordeck.app.worldle.common.GameViewModelAndroid
 import com.nordeck.app.worldle.common.model.GameViewModel
 import com.nordeck.app.worldle.common.model.Guess
 import com.nordeck.app.worldle.ui.theme.WorldleAndroidTheme
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: GameViewModelAndroid by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel: GameViewModel = GameViewModelAndroid(
-            repository = (applicationContext as AppApplication).repository
-        )
-
         setContent {
             WorldleAndroidTheme {
                 // A surface container using the 'background' color from the theme
