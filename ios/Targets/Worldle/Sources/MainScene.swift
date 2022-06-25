@@ -77,10 +77,11 @@ struct GuessView: View {
         HStack {
             Text(guess.country.name)
             Spacer()
-            Text(guess.formattedDistance)
+            Text(guess.getDistanceFrom())
             Image(systemName: guess.imageName)
                 .foregroundColor(.blue)
                 .rotationEffect(.degrees(Double(guess.direction.rotation)))
+            Text("\(guess.proximityPercent)%")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -152,7 +153,7 @@ class ViewModel: ObservableObject {
     @Published var input = ""
 
     init(repository: Repository) {
-        commonVM = GameViewModelCommon(repository: repository, scope: scopeProvider.scope, date: "1/11/1911")
+        commonVM = GameViewModelCommon(repository: repository, scope: scopeProvider.scope, date: PlatformKt.getDate())
         createOptionalPublisher(flowWrapper: PlatformKt.getState(commonVM, scope: scopeProvider))
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -213,13 +214,6 @@ extension Guess: Identifiable {
 }
 
 extension Guess {
-
-    var formattedDistance: String {
-        if NSLocale.current.usesMetricSystem {
-            return "\(ConversionMath.companion.metersToKilometers(meters: distanceFromMeters)) km"
-        }
-        return "\(ConversionMath.companion.metersToMiles(meters: distanceFromMeters)) mi"
-    }
 
     var imageName: String {
         if direction.isDirection {

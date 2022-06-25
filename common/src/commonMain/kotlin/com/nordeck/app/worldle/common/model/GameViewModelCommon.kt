@@ -2,6 +2,7 @@ package com.nordeck.app.worldle.common.model
 
 import com.nordeck.app.worldle.common.GeoMath
 import com.nordeck.app.worldle.common.db.History
+import com.nordeck.app.worldle.common.getDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,16 +13,15 @@ import kotlin.random.Random
 class GameViewModelCommon(
     private val repository: Repository,
     private val scope: CoroutineScope,
-    private val date: String
+    private val date: String = getDate()
 ) : GameViewModel {
 
     private val stateMutableFlow = MutableSharedFlow<GameViewModel.State?>(1)
     override val state: Flow<GameViewModel.State?> = stateMutableFlow.asSharedFlow()
     private var currentState: GameViewModel.State? = null
 
-    private fun getRandom(countries: List<Country>): Random {
-        val seed = "$date+${countries.size}".hashCode()
-        return Random(seed)
+    private fun getRandom(): Random {
+        return Random(date.hashCode())
     }
 
     init {
@@ -30,15 +30,14 @@ class GameViewModelCommon(
             val state = repository.getSavedGame(date)
                 ?.let {
                     restoreGame(countries, it)
-                } ?: createNewGame(countries, countries.random(getRandom(countries)))
+                } ?: createNewGame(countries, countries.random(getRandom()))
             updateState(state)
         }
     }
 
     override fun resetGame() {
         currentState?.allCountries?.run {
-            val seed = "$date+${this.size}".hashCode()
-            updateState(createNewGame(this, this.random(Random(seed))))
+            updateState(createNewGame(this, this.random(getRandom())))
         }
     }
 
