@@ -2,7 +2,6 @@
 import SwiftUI
 
 /// https://gist.github.com/rnapier/a37cdbf4aabb1e4a6b40436efc2c3114
-
 public struct TextStyle {
     // This type is opaque because it exposes NSAttributedString details and requires unique keys.
     // It can be extended, however, by using public static methods.
@@ -15,7 +14,7 @@ public struct TextStyle {
     }
 }
 
-// Public methods for building styles
+/// https://developer.apple.com/documentation/foundation/nsattributedstring/key
 public extension TextStyle {
     static func foregroundColor(_ color: Color) -> TextStyle {
         TextStyle(key: .init("TextStyleForegroundColor"), apply: { $0.foregroundColor(color) })
@@ -70,6 +69,7 @@ extension StyledText {
 }
 
 extension StyledText: View {
+    
     public var body: some View { text() }
 
     public func text() -> Text {

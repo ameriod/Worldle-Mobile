@@ -93,7 +93,6 @@ struct SuggestionView: View {
     var action: () -> Void
 
     var body: some View {
-        // TODO highlight
         HighlightText(text: suggestion.name, match: input, hightlightColor: .blue)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
@@ -202,14 +201,14 @@ extension Country {
 extension Country: Identifiable {
 
     public var id: String {
-        code
+        code + "_suggestion"
     }
 }
 
 extension Guess: Identifiable {
 
     public var id: String {
-        country.code
+        country.code + "_guess"
     }
 }
 
