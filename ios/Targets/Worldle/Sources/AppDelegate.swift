@@ -1,3 +1,4 @@
+@_exported import common
 import ForestKit
 import UIKit
 
@@ -12,6 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        KoinKt.doInitKoin()
         #if DEBUG
         Forest.plant(
             ForestKit.PrintTree()
@@ -21,3 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
+
+private let scopeProviderHelper = ScopeProviderHelper()
+
+let mainScope = scopeProviderHelper.main()
+let globalScope = scopeProviderHelper.global()

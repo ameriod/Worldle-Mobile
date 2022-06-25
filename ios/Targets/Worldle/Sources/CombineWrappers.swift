@@ -1,7 +1,6 @@
 // From: https://github.com/touchlab/SwiftCoroutines
 
 import Combine
-import common
 
 func createPublisher<T>(flowWrapper: FlowWrapper<T>) -> AnyPublisher<T, KotlinError> {
     Deferred<Publishers.HandleEvents<PassthroughSubject<T, KotlinError>>> {

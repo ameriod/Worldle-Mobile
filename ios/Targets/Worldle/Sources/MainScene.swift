@@ -1,4 +1,3 @@
-import common
 import SVGView
 import SwiftUI
 
@@ -6,11 +5,11 @@ import SwiftUI
 struct MainScene: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    let repository = Repository(fileLoader: BundleFileLoader(), historyDatabase: PlatformKt.createHistoryDatabase())
+    let viewModle = Repository(fileLoader: BundleFileLoader(), historyDatabase: PlatformKt.createHistoryDatabase())
 
     var body: some Scene {
         WindowGroup {
-            GameView(ViewModel(repository: repository))
+            GameView(ViewModel())
         }
     }
 }
@@ -134,26 +133,19 @@ extension String {
     }
 }
 
-class BundleFileLoader: FileLoader {
-    func getStringFromFile(fileName: String) -> String {
-        let filepath = Bundle.main.resourcePath! + "/\(fileName)"
-        do {
-            return try String(contentsOfFile: filepath)
-        } catch {
-            fatalError("Error contents could not be loaded for \(fileName)")
-        }
-    }
-}
-
 class ViewModel: ObservableObject {
 
     private let commonVM: GameViewModelCommon
-    private let scopeProvider: ScopeProvider = SharedGlobalScopeProvider()
+    private let scopeProvider: ScopeProvider
     @Published var state: GameViewModelState?
     @Published var input = ""
 
-    init(repository: Repository) {
-        commonVM = GameViewModelCommon(repository: repository, scope: scopeProvider.scope, date: PlatformKt.getDate())
+    init(
+        commonVM: GameViewModelCommon = GameViewModelHelper().viewModel(),
+        scopeProvider: ScopeProvider = globalScope
+    ) {
+        self.commonVM = commonVM
+        self.scopeProvider = scopeProvider
         createOptionalPublisher(flowWrapper: PlatformKt.getState(commonVM, scope: scopeProvider))
             .removeDuplicates()
             .receive(on: DispatchQueue.main)

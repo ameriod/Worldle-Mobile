@@ -36,7 +36,7 @@ let project = Project(
                    .swiftformat
                ],
                dependencies: [
-                   .xcframework(path: "../common/build/XCFrameworks/debug/common.xcframework"),
+                   .xcframework(path: "../common/build/XCFrameworks/debug/Common.xcframework"),
                    .package(product: "SVGView"),
                    .package(product: "ForestKit"),
                    .package(product: "Resolver"),
