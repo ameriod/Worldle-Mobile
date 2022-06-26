@@ -26,6 +26,18 @@ interface GameViewModel {
 
         val hasWonGame: Boolean = guesses.any { it.country == countryToGuess }
 
+        val sharePercent: Int
+            get() = if (hasWonGame) {
+                if (guesses.size == 1) {
+                    100
+                } else {
+                    // We want the % left over
+                    ((MAX_GUESSES - guesses.size) / MAX_GUESSES.toDouble() * 100).toInt()
+                }
+            } else {
+                0
+            }
+
         fun toHistory(date: String): History =
             History(
                 date = date,

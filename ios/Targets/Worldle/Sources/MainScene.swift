@@ -42,7 +42,7 @@ struct GameView: View {
                                 .padding(.horizontal, -16)
                         }
                         Button("Share") {
-                            // TODO share
+                            share(state: state)
                         }
                         #if DEBUG
                         Button("Reset") {
@@ -65,6 +65,12 @@ struct GameView: View {
         } else {
             Text("Loading...")
         }
+    }
+
+    func share(state: GameViewModelState) {
+        let textToShare = "Worldle \(state.guesses.count)/5 - \(state.hasWonGame ? "Won" : "Lost"): \(state.sharePercent)% "
+        let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
+        UIApplication.shared.keyWindow?.rootViewController?.present(activityVC, animated: true, completion: nil)
     }
 }
 
@@ -120,16 +126,6 @@ struct HighlightText: View {
                     $0.range(of: match.lowercased()),
                 ]
             })
-    }
-}
-
-extension String {
-    func split(usingRegex pattern: String) -> [String] {
-        // ### Crashes when you pass invalid `pattern`
-        let regex = try! NSRegularExpression(pattern: pattern)
-        let matches = regex.matches(in: self, range: NSRange(0..<utf16.count))
-        let ranges = [startIndex..<startIndex] + matches.map { Range($0.range, in: self)! } + [endIndex..<endIndex]
-        return (0...matches.count).map { String(self[ranges[$0].upperBound..<ranges[$0 + 1].lowerBound]) }
     }
 }
 

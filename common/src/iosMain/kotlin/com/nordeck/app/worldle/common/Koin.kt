@@ -10,12 +10,9 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
-fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
-    appDeclaration()
+fun initKoin() = startKoin {
     modules(commonModule)
 }
-
-fun initKoin() = initKoin {}
 
 val commonModule = module {
 

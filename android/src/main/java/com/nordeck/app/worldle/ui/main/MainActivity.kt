@@ -1,5 +1,7 @@
 package com.nordeck.app.worldle.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nordeck.app.worldle.BuildConfig
+import com.nordeck.app.worldle.R
 import com.nordeck.app.worldle.common.GameViewModelAndroid
 import com.nordeck.app.worldle.common.model.GameViewModel
 import com.nordeck.app.worldle.common.model.Guess
@@ -141,6 +144,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             }
                         }
                     }
+                    val context = LocalContext.current
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -149,7 +153,10 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                                 vertical = 8.dp
                             ),
                         onClick = {
-                            // TODO share logic
+                            shareResults(
+                                context = context,
+                                state = state
+                            )
                         }
                     ) {
                         Text(text = "Share")
@@ -223,6 +230,22 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
             }
         }
     }
+}
+
+private fun shareResults(context: Context, state: GameViewModel.State) {
+    val intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(
+            Intent.EXTRA_TEXT,
+            """
+           ${context.getString(R.string.app_name)} ${state.guesses.size}/5 - ${if (state.hasWonGame) "Won" else "Lost"}: ${state.sharePercent}%     
+            """.trimIndent()
+        )
+        type = "text/plain"
+    }.let {
+        Intent.createChooser(it, null)
+    }
+    context.startActivity(intent)
 }
 
 @Composable
