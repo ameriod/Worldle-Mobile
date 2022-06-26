@@ -9,13 +9,13 @@ extension Resolver: ResolverRegistering {
             scopeProviderHelper.main()
         }
         .implements(ScopeProvider.self, name: .mainScopeProvider)
-        .scope(.cached)
+        .scope(.application)
 
         register {
             scopeProviderHelper.global()
         }
         .implements(ScopeProvider.self, name: .globalScopeProvider)
-        .scope(.cached)
+        .scope(.application)
 
         register {
             ViewModel(
