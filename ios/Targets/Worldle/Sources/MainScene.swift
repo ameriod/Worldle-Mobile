@@ -68,7 +68,7 @@ struct GameView: View {
     }
 
     func share(state: GameViewModelState) {
-        let textToShare = "Worldle \(state.guesses.count)/5 - \(state.hasWonGame ? "Won" : "Lost"): \(state.sharePercent)% "
+        let textToShare = "\(Bundle.main.appName) \(state.guesses.count)/5 - \(state.hasWonGame ? "Won" : "Lost"): \(state.sharePercent)% "
         let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
         UIApplication.shared.keyWindow?.rootViewController?.present(activityVC, animated: true, completion: nil)
     }
