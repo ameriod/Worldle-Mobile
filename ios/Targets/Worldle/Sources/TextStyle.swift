@@ -69,7 +69,7 @@ extension StyledText {
 }
 
 extension StyledText: View {
-    
+
     public var body: some View { text() }
 
     public func text() -> Text {

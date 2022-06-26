@@ -7,7 +7,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
-import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
 fun initKoin() = startKoin {

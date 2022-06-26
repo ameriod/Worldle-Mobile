@@ -28,11 +28,11 @@ extension Resolver: ResolverRegistering {
 }
 
 extension Resolver.Name {
-    
+
     static var globalScopeProvider: Resolver.Name? {
         .name(fromString: "Global")
     }
-    
+
     static var mainScopeProvider: Resolver.Name? {
         .name(fromString: "Main")
     }
