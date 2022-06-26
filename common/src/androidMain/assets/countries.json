@@ -42,12 +42,6 @@
     "name": "Armenia"
   },
   {
-    "code": "AN",
-    "latitude": 12.226079,
-    "longitude": -69.060087,
-    "name": "Netherlands Antilles"
-  },
-  {
     "code": "AO",
     "latitude": -11.202692,
     "longitude": 17.873887,
@@ -414,12 +408,6 @@
     "name": "Falkland Islands (Malvinas)"
   },
   {
-    "code": "FM",
-    "latitude": 7.425554,
-    "longitude": 150.550812,
-    "name": "Micronesia"
-  },
-  {
     "code": "FO",
     "latitude": 61.892635,
     "longitude": -6.911806,
@@ -546,12 +534,6 @@
     "name": "Guyana"
   },
   {
-    "code": "GZ",
-    "latitude": 31.354676,
-    "longitude": 34.308825,
-    "name": "Gaza Strip"
-  },
-  {
     "code": "HK",
     "latitude": 22.396428,
     "longitude": 114.109497,
@@ -646,12 +628,6 @@
     "latitude": 41.87194,
     "longitude": 12.56738,
     "name": "Italy"
-  },
-  {
-    "code": "JE",
-    "latitude": 49.214439,
-    "longitude": -2.13125,
-    "name": "Jersey"
   },
   {
     "code": "JM",
@@ -834,12 +810,6 @@
     "name": "Madagascar"
   },
   {
-    "code": "MH",
-    "latitude": 7.131474,
-    "longitude": 171.184478,
-    "name": "Marshall Islands"
-  },
-  {
     "code": "MK",
     "latitude": 41.608635,
     "longitude": 21.745275,
@@ -868,12 +838,6 @@
     "latitude": 22.198745,
     "longitude": 113.543873,
     "name": "Macau"
-  },
-  {
-    "code": "MP",
-    "latitude": 17.33083,
-    "longitude": 145.38469,
-    "name": "Northern Mariana Islands"
   },
   {
     "code": "MQ",
@@ -1072,12 +1036,6 @@
     "latitude": 18.220833,
     "longitude": -66.590149,
     "name": "Puerto Rico"
-  },
-  {
-    "code": "PS",
-    "latitude": 31.952162,
-    "longitude": 35.233154,
-    "name": "Palestine"
   },
   {
     "code": "PT",
@@ -1332,12 +1290,6 @@
     "name": "Trinidad and Tobago"
   },
   {
-    "code": "TV",
-    "latitude": -7.109535,
-    "longitude": 177.64933,
-    "name": "Tuvalu"
-  },
-  {
     "code": "TW",
     "latitude": 23.69781,
     "longitude": 120.960515,
@@ -1432,12 +1384,6 @@
     "latitude": -13.759029,
     "longitude": -172.104629,
     "name": "Samoa"
-  },
-  {
-    "code": "XK",
-    "latitude": 42.602636,
-    "longitude": 20.902977,
-    "name": "Kosovo"
   },
   {
     "code": "YE",

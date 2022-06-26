@@ -1,5 +1,7 @@
 package com.nordeck.app.worldle.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,7 +27,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,21 +43,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.nordeck.app.worldle.AppApplication
 import com.nordeck.app.worldle.BuildConfig
+import com.nordeck.app.worldle.R
+import com.nordeck.app.worldle.common.GameViewModelAndroid
+import com.nordeck.app.worldle.common.model.GameViewModel
 import com.nordeck.app.worldle.common.model.Guess
-import com.nordeck.app.worldle.model.drawableResId
-import com.nordeck.app.worldle.model.vectorAsset
 import com.nordeck.app.worldle.ui.theme.WorldleAndroidTheme
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: GameViewModelAndroid by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel = GameViewModel(
-            repository = (applicationContext as AppApplication).repository
-        )
-
         setContent {
             WorldleAndroidTheme {
                 // A surface container using the 'background' color from the theme
@@ -63,7 +65,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    when (val state = viewModel.state.observeAsState().value) {
+                    when (val state = viewModel.state.collectAsState(null).value) {
                         null -> GameLoadingView()
                         else -> GameView(state, viewModel)
                     }
@@ -142,6 +144,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             }
                         }
                     }
+                    val context = LocalContext.current
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -150,7 +153,10 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                                 vertical = 8.dp
                             ),
                         onClick = {
-                            // TODO share logic
+                            shareResults(
+                                context = context,
+                                state = state
+                            )
                         }
                     ) {
                         Text(text = "Share")
@@ -174,7 +180,6 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
             }
             else -> {
                 item {
-                    val highlightColor = MaterialTheme.colors.primary
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -194,7 +199,7 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             Text(text = "Country, territory...")
                         },
                         onValueChange = {
-                            viewModel.onGuessUpdated(it, highlightColor)
+                            viewModel.onGuessUpdated(it)
                         },
                         keyboardActions = KeyboardActions {
                             viewModel.onGuessDone()
@@ -220,11 +225,27 @@ fun GameView(state: GameViewModel.State, viewModel: GameViewModel) {
                             horizontal = 16.dp,
                             vertical = 8.dp
                         ),
-                    text = suggestion.displayText
+                    text = suggestion.highlightGuess(state.guessInput, MaterialTheme.colors.primary)
                 )
             }
         }
     }
+}
+
+private fun shareResults(context: Context, state: GameViewModel.State) {
+    val intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(
+            Intent.EXTRA_TEXT,
+            """
+           ${context.getString(R.string.app_name)} ${state.guesses.size}/5 - ${if (state.hasWonGame) "Won" else "Lost"}: ${state.sharePercent}%     
+            """.trimIndent()
+        )
+        type = "text/plain"
+    }.let {
+        Intent.createChooser(it, null)
+    }
+    context.startActivity(intent)
 }
 
 @Composable

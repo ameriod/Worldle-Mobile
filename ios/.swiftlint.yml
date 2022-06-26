@@ -1,0 +1,59 @@
+disabled_rules:
+  - function_body_length
+  - multiple_closures_with_trailing_closure
+  - nesting
+  - trailing_comma
+
+  # Statement position means else and catch blocks.
+  # This rule makes little sense when using single-line do and if blocks.
+  - statement_position
+
+  # This is broken and too eager
+  - syntactic_sugar
+
+  # Using a custom rule
+  - todo
+
+opt_in_rules:
+  - implicit_return
+
+file_length:
+  ignore_comment_only_lines: true
+
+cyclomatic_complexity:
+  ignores_case_statements: true
+  warning: 4
+  error: 9
+
+large_tuple:
+  error: 3
+  warning: 3
+
+line_length: 200
+
+trailing_whitespace:
+  ignores_empty_lines: true
+
+type_name:
+  allowed_symbols: "_"
+
+identifier_name:
+  max_length:
+    warning: 200
+  allowed_symbols: "_"
+  excluded:
+    - id
+    - x
+    - y
+    - en
+    - es
+    - no
+
+# Custom rules
+custom_rules:
+  already_true:
+    regex: "== true"
+    message: "Don't compare to true, just use the bool value."
+  already_bool:
+    regex: "== false"
+    message: "Don't compare to false, just use !value."
