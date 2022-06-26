@@ -1,3 +1,4 @@
+import Resolver
 import SVGView
 import SwiftUI
 
@@ -5,22 +6,16 @@ import SwiftUI
 struct MainScene: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    let viewModle = Repository(fileLoader: BundleFileLoader(), historyDatabase: PlatformKt.createHistoryDatabase())
-
     var body: some Scene {
         WindowGroup {
-            GameView(ViewModel())
+            GameView()
         }
     }
 }
 
 struct GameView: View {
 
-    @ObservedObject var viewModel: ViewModel
-
-    init(_ viewModel: ViewModel) {
-        self.viewModel = viewModel
-    }
+    @InjectedObject var viewModel: ViewModel
 
     var body: some View {
         if let state = viewModel.state {
@@ -137,8 +132,8 @@ class ViewModel: ObservableObject {
     @Published var input = ""
 
     init(
-        commonVM: GameViewModelCommon = GameViewModelHelper().viewModel(),
-        scopeProvider: ScopeProvider = globalScope
+        commonVM: GameViewModelCommon,
+        scopeProvider: ScopeProvider
     ) {
         self.commonVM = commonVM
         self.scopeProvider = scopeProvider

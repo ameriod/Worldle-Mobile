@@ -24,11 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-private let scopeProviderHelper = ScopeProviderHelper()
-
-let mainScope = scopeProviderHelper.main()
-let globalScope = scopeProviderHelper.global()
-
 extension UIApplication {
 
     var keyWindow: UIWindow? {
